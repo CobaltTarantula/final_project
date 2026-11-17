@@ -2,4 +2,5 @@
 |-------|-------|------:|
 | 11/16/26 | In class brainstorm | 0.5 |
 | 11/16/26 | Brainstorm and plan with codex | 0.5 |
-| **Total** |   | **1.0** |
+| 11/16/26 | Locate, reconfigure, and copy Rune assets | 0.5 |
+| **Total** |   | **1.5** |
