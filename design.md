@@ -1,6 +1,7 @@
 # Design
 ## Summary
-- [x] Summary of your project purpose and goals (words and pictures — help classmates quickly grasp your project)
+- [x] Summary of your project purpose and goals 
+    - [ ] (words and pictures — help classmates quickly grasp your project)
 - [x] technology choices
 - [x] security boundaries
 - [x] scaling considerations 
@@ -37,13 +38,19 @@ The project will provide an efficient and quick means of translating words or sm
 * Flask is free...
 
 ## ERD
-Initial ERD sketching the data your project will use
+- [x] Initial ERD sketching the data your project will use
+
+### With grammar in database
+![img](/erd_with-grammar.png)
+
+### Without grammar in database
+![img](/erd_without_grammar.png)
 
 ## Diagram
 ![img](/diagram.png)
 
 ## Daily Goals
-Initial daily goals from now through end of class
+- [ ] Initial daily goals from now through end of class
 
 ## UX
-Optional: rough UX sketches if applicable
+ - [ ] Optional: rough UX sketches if applicable
