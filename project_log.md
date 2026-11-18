@@ -3,4 +3,5 @@
 | 11/16/26 | In class brainstorm | 0.5 |
 | 11/16/26 | Brainstorm and plan with codex | 0.5 |
 | 11/16/26 | Locate, reconfigure, and copy Rune assets | 0.5 |
-| **Total** |   | **1.5** |
+| 11/17/26 | Pitch prep | 0.5 |
+| **Total** |   | **2.0** |
