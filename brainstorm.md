@@ -1,10 +1,11 @@
-# Project Ideas
+# Design
+## Project Ideas
 * coupon/deal finder
 * choose your own adventure game
 * **Faeric language translator**
 * translator?
 
-## Interests
+### Interests
 * Superheroes
 * Star Wars
 * Harry Potter
@@ -22,10 +23,10 @@
     * MTG
     * Villainous
 
-# Pitch
-## Faeric Language Translator/Language Builder
+## Pitch
+### Faeric Language Translator/Language Builder
 I have the beginnings of an original language I created for DND. This project can serve as a way to flesh it out, and create a translator app that can take simple English and translate it into Faeric, and vice versa.
-## Questions to answer
+### Questions to answer
 1. Why are you interested in this project?
     - I am excited to work more on projects related to my homebrew DND world.
     - I believe this can be applied to other original or spoken languages.
@@ -37,6 +38,9 @@ I have the beginnings of an original language I created for DND. This project ca
     - MongoDB with PyMongo: persistent data storage (lexicon, language rules, translation history)
     - HTML + CSS: UI
     - GitHub: repo and final report.
+
+## Diagram
+![img](/diagram.png)
 
 # Future Codex Prompts
 I have a custom font .otf file saved to sources, this holds the alphabet. There is also a pdf file called faeric-runes.pdf in sources that holds what I have already defined for the language.
