@@ -50,7 +50,7 @@ Travel </br>
 ### With grammar in database
 ![img](/diagram.png)
 
-### Without grammer in database
+### Without grammar in database
 ![img](/diagram1.png)
 
 ## Daily Goals
