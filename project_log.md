@@ -6,4 +6,5 @@
 | 11/17/26 | Pitch prep | 0.5 |
 | 11/17/26 | Design | 1.0 |
 | 11/18/26 | Initial ERD ideas | 0.5 |
+| 11/18/26 | Finished Pitch | 0.5|
 | **Total** |   | **3.5** |

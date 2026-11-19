@@ -11,6 +11,12 @@ I have the beginnings of an original language I created for DND. This project ca
 
 The project will provide an efficient and quick means of translating words or small phrases, instead of me having to scroll my google doc.
 
+Hello
+![img](/sources/faeric-hello-snip.jpg)
+To and from </br> 
+Travel </br>
+![img](/sources/travel_runes-edited.png)
+
 ### Technologies:
 - Python: translation, tokenization, word lookup, grammar application
 - Flask: Web Interface?
