@@ -1,11 +1,5 @@
 # Design
 ## Summary
-- [x] Summary of your project purpose and goals 
-    - [ ] (words and pictures — help classmates quickly grasp your project)
-- [x] technology choices
-- [x] security boundaries
-- [x] scaling considerations 
-- [x] costs
 
 I have the beginnings of an original language I created for DND. This project can serve as a way to flesh it out, and create a translator app that can take simple English and translate it into Faeric, and vice versa.
 
@@ -44,7 +38,6 @@ Travel </br>
 * Flask is free...
 
 ## ERD
-- [x] Initial ERD sketching the data your project will use
 
 ### With grammar in database
 ![img](/erd_with-grammar.png)
@@ -52,11 +45,17 @@ Travel </br>
 ### Without grammar in database
 ![img](/erd_without_grammar.png)
 
-## Diagram
+## System Design Diagrams
+
+### With grammar in database
 ![img](/diagram.png)
 
+### Without grammer in database
+![img](/diagram1.png)
+
 ## Daily Goals
-- [ ] Initial daily goals from now through end of class
+* 1-2 hours of work per day
+* end each day with something new and/or functional commited
 
 ## UX
- - [ ] Optional: rough UX sketches if applicable
+![img](ux-translate.png)

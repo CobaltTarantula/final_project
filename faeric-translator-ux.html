@@ -1,0 +1,135 @@
+<div id="faeric-translator-ux" aria-label="Faeric translator interface mockup">
+  <style>
+    #faeric-translator-ux {
+      --ft-ink: light-dark(#233027, #edf2e9);
+      --ft-muted: light-dark(#69756b, #aab5a9);
+      --ft-paper: light-dark(#fbfaf5, #202722);
+      --ft-panel: light-dark(#ffffff, #29322c);
+      --ft-line: light-dark(#e4e7df, #414b43);
+      --ft-green: light-dark(#385b45, #8bb393);
+      --ft-green-ink: light-dark(#ffffff, #18251b);
+      --ft-wash: light-dark(#edf2e9, #333e35);
+      color: var(--ft-ink);
+      font: 400 15px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    #faeric-translator-ux * { box-sizing: border-box; }
+    #faeric-translator-ux .ft-app {
+      overflow: hidden;
+      border: 1px solid var(--ft-line);
+      border-radius: 16px;
+      background: var(--ft-paper);
+    }
+    #faeric-translator-ux .ft-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--ft-line);
+      background: var(--ft-panel);
+    }
+    #faeric-translator-ux .ft-brand { display: flex; align-items: center; gap: 11px; font-weight: 500; }
+    #faeric-translator-ux .ft-mark {
+      display: grid; place-items: center; width: 34px; height: 34px;
+      border-radius: 11px; background: var(--ft-wash); color: var(--ft-green); font-size: 18px;
+    }
+    #faeric-translator-ux .ft-nav { display: flex; gap: 6px; }
+    #faeric-translator-ux .ft-nav button, #faeric-translator-ux .ft-quiet {
+      border: 0; background: transparent; color: var(--ft-muted); font: inherit; padding: 8px 11px; border-radius: 8px;
+    }
+    #faeric-translator-ux .ft-nav button[aria-current="page"] { color: var(--ft-ink); background: var(--ft-wash); }
+    #faeric-translator-ux .ft-main { max-width: 760px; margin: 0 auto; padding: 36px 28px 30px; }
+    #faeric-translator-ux .ft-heading { margin: 0 0 7px; font-size: 27px; font-weight: 500; letter-spacing: -0.035em; }
+    #faeric-translator-ux .ft-sub { margin: 0 0 25px; color: var(--ft-muted); }
+    #faeric-translator-ux .ft-direction { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: var(--ft-muted); font-size: 13px; }
+    #faeric-translator-ux .ft-direction strong { color: var(--ft-ink); font-weight: 500; }
+    #faeric-translator-ux .ft-swap { color: var(--ft-green); font-size: 17px; }
+    #faeric-translator-ux .ft-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    #faeric-translator-ux .ft-language-box {
+      min-height: 188px; padding: 15px 16px 12px; border: 1px solid var(--ft-line);
+      border-radius: 12px; background: var(--ft-panel); display: flex; flex-direction: column;
+    }
+    #faeric-translator-ux .ft-label { margin-bottom: 9px; color: var(--ft-muted); font-size: 12px; }
+    #faeric-translator-ux textarea {
+      width: 100%; min-height: 95px; resize: vertical; border: 0; outline: none;
+      padding: 0; background: transparent; color: var(--ft-ink); font: inherit; font-size: 16px;
+    }
+    #faeric-translator-ux textarea::placeholder { color: var(--ft-muted); opacity: .75; }
+    #faeric-translator-ux .ft-result { min-height: 95px; font-size: 19px; line-height: 1.5; }
+    #faeric-translator-ux .ft-hint { margin-top: auto; color: var(--ft-muted); font-size: 11px; }
+    #faeric-translator-ux .ft-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; }
+    #faeric-translator-ux .ft-primary {
+      border: 0; border-radius: 9px; padding: 11px 17px; background: var(--ft-green); color: var(--ft-green-ink);
+      font: inherit; font-weight: 500; cursor: pointer;
+    }
+    #faeric-translator-ux .ft-note { color: var(--ft-muted); font-size: 12px; }
+    #faeric-translator-ux .ft-history { margin-top: 34px; }
+    #faeric-translator-ux .ft-history-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+    #faeric-translator-ux .ft-history h2 { margin: 0; font-size: 15px; font-weight: 500; }
+    #faeric-translator-ux .ft-history a { color: var(--ft-green); text-decoration: none; font-size: 12px; }
+    #faeric-translator-ux .ft-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; padding: 12px 0; border-top: 1px solid var(--ft-line); font-size: 13px; }
+    #faeric-translator-ux .ft-row span:last-child { color: var(--ft-muted); font-size: 11px; }
+    @media (max-width: 560px) {
+      #faeric-translator-ux .ft-topbar { padding: 13px 15px; }
+      #faeric-translator-ux .ft-nav button { padding: 7px; font-size: 12px; }
+      #faeric-translator-ux .ft-main { padding: 27px 16px 24px; }
+      #faeric-translator-ux .ft-heading { font-size: 23px; }
+      #faeric-translator-ux .ft-panels { grid-template-columns: 1fr; }
+      #faeric-translator-ux .ft-language-box { min-height: 150px; }
+      #faeric-translator-ux .ft-result, #faeric-translator-ux textarea { min-height: 65px; }
+      #faeric-translator-ux .ft-row { grid-template-columns: 1fr 1fr; }
+      #faeric-translator-ux .ft-row span:last-child { grid-column: 1 / -1; }
+    }
+  </style>
+  <section class="ft-app" aria-label="Translator home screen">
+    <header class="ft-topbar">
+      <div class="ft-brand"><span class="ft-mark" aria-hidden="true">ᚠ</span><span>Faeric</span></div>
+      <nav class="ft-nav" aria-label="Main navigation">
+        <button type="button" aria-current="page">Translate</button>
+        <button type="button">Dictionary</button>
+        <button type="button">History</button>
+      </nav>
+    </header>
+    <main class="ft-main">
+      <h1 class="ft-heading">Find the words</h1>
+      <p class="ft-sub">Translate a phrase using your Faeric vocabulary and language rules.</p>
+      <div class="ft-direction" aria-label="Translation direction"><strong>English</strong><span class="ft-swap" aria-hidden="true">↔</span><strong>Faeric</strong></div>
+      <div class="ft-panels">
+        <section class="ft-language-box" aria-label="English input">
+          <label class="ft-label" for="ft-source">English</label>
+          <textarea id="ft-source" placeholder="Type a word or short sentence…">The moon guards the forest.</textarea>
+          <div class="ft-hint">Try a short phrase</div>
+        </section>
+        <section class="ft-language-box" aria-label="Faeric translation" aria-live="polite">
+          <span class="ft-label">Faeric</span>
+          <div class="ft-result" id="ft-result">Ael luneth vae thalan.</div>
+          <div class="ft-hint" id="ft-status">Based on your current lexicon and rules</div>
+        </section>
+      </div>
+      <div class="ft-actions">
+        <button class="ft-primary" id="ft-translate" type="button">Translate phrase</button>
+        <span class="ft-note">Saved to your translation history</span>
+      </div>
+      <section class="ft-history" aria-label="Recent translations">
+        <div class="ft-history-head"><h2>Recent translations</h2><a href="#history">View history</a></div>
+        <div class="ft-row"><span>Good morning.</span><span>Vael aran.</span><span>Today</span></div>
+        <div class="ft-row"><span>Where is the river?</span><span>Sael en vaer?</span><span>Yesterday</span></div>
+      </section>
+    </main>
+  </section>
+  <script>
+    (() => {
+      const root = document.getElementById("faeric-translator-ux");
+      const input = root.querySelector("#ft-source");
+      const result = root.querySelector("#ft-result");
+      const status = root.querySelector("#ft-status");
+      root.querySelector("#ft-translate").addEventListener("click", () => {
+        const phrase = input.value.trim();
+        result.textContent = phrase ? "Translation preview" : "Enter a phrase to translate.";
+        status.textContent = phrase ? "A real app would translate this with your saved words and rules." : "Your input is empty.";
+      });
+    })();
+  </script>
+</div>
