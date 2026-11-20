@@ -22,6 +22,7 @@
         <span class="field-label">{% if direction == 'en_to_fae' %}Faeric{% else %}English{% endif %}</span>
         {% if result is not none %}
           <p class="translation-result {% if direction == 'en_to_fae' %}faeric-text{% endif %}">{{ result }}</p>
+          {% if direction == 'en_to_fae' and pronunciation %}<p class="pronunciation-result"><span class="field-label">Pronunciation / Latin transliteration</span><span>{{ pronunciation }}</span></p>{% endif %}
           {% if unknown_words %}<p class="unknown-note">Not found in lexicon: {{ unknown_words | join(", ") }}</p>{% else %}<p class="field-hint">All words matched your lexicon or rules.</p>{% endif %}
         {% else %}
           <p class="placeholder-result">Your translation will appear here.</p>
@@ -35,7 +36,7 @@
     <div class="section-heading"><h2>Recent translations</h2><a href="{{ url_for('history') }}">View history</a></div>
     {% if recent %}
       {% for row in recent %}
-        <div class="recent-row"><span class="{% if row.source_language == 'fae' %}faeric-text{% endif %}">{{ row.original_text }}</span><span class="{% if row.target_language == 'fae' %}faeric-text{% endif %}">{{ row.translated_text }}</span><time>{{ row.created_at }}</time></div>
+        <div class="recent-row"><span class="{% if row.source_language == 'fae' %}faeric-text{% endif %}">{{ row.original_text }}</span><span class="recent-result"><span class="{% if row.target_language == 'fae' %}faeric-text{% endif %}">{{ row.translated_text }}</span>{% if row.target_language == 'fae' and row.pronunciation_text %}<small>{{ row.pronunciation_text }}</small>{% endif %}</span><time>{{ row.created_at }}</time></div>
       {% endfor %}
     {% else %}<p class="empty-state">Your saved translations will show up here.</p>{% endif %}
   </section>

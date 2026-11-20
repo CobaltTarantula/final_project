@@ -16,38 +16,38 @@ MAX_TEXT_LENGTH = 500
 # Transcribed from sources/Fae Rune Pronunciation Guide and Dictionary.docx.
 # The Faeric spellings are the document's Latin-keyboard rune transcriptions.
 SOURCE_LEXICON = [
-    ("light", "t", "rune meaning", "t", "Rune name: Trye; also life and joy"),
-    ("life", "t", "rune meaning", "t", "Rune name: Trye; also light and joy"),
-    ("joy", "t", "rune meaning", "t", "Rune name: Trye; also light and life"),
-    ("sun", "d", "rune meaning", "d", "Rune name: Drye"),
-    ("heat", "f", "rune meaning", "f", "Rune name: Frey"),
-    ("fire", "v", "rune meaning", "v", "Rune name: Vey"),
-    ("air", "i", "rune meaning", "e͡ɪ", "Rune name: Ave"),
-    ("cloud", "e", "rune meaning", "iː", "Rune name: Eve"),
-    ("water", "w", "rune meaning", "w", "Rune name: Uan"),
-    ("rain", "W", "rune meaning", "", ""),
-    ("earth", "R", "rune meaning", "ɹ", "Rune name: T’r"),
-    ("stone", "R", "rune meaning", "", ""),
-    ("lava", "A", "rune meaning", "a͡ɪ", "Rune name: Aine"),
-    ("lightning", "L", "rune meaning", "l", "Rune name: L’v"),
-    ("cold", "s", "rune meaning", "s", "Rune name: Syle"),
-    ("ice", "Z", "rune meaning", "z", "Rune name: Zyle"),
-    ("plant", "p", "rune meaning", "p", "Rune name: Pl’v"),
-    ("wood", "B", "rune meaning", "b", "Rune name: Bl’v"),
-    ("dark", "k", "rune meaning", "k", "Rune name: Kor; also death and misery"),
-    ("death", "k", "rune meaning", "k", "Rune name: Kor; also dark and misery"),
-    ("misery", "k", "rune meaning", "k", "Rune name: Kor; also dark and death"),
-    ("moon", "K", "rune meaning", "", ""),
-    ("yet", "G", "rune meaning", "g", "Rune name: Gyur"),
-    ("and", "H", "rune meaning", "h", "Rune name: Yhol"),
-    ("to", "j", "rune meaning", "d͡ʒ", "Rune name: Jhu"),
-    ("from", "J", "rune meaning", "", "Rune name: Jhu; meaning from/of"),
-    ("of", "J", "rune meaning", "", "Rune name: Jhu; meaning from/of"),
-    ("or", "n", "rune meaning", "n", "Rune name: Nur"),
-    ("nor", "m", "rune meaning", "m", "Rune name: Mur"),
-    ("so", "u", "rune meaning", "u", "Rune name: Urd"),
-    ("but", "O", "rune meaning", "o͡ʊ", "Rune name: Ord"),
-    ("for", "y", "rune meaning", "j", "Rune name: Yere"),
+    ("light", "t", "rune meaning", "Trye", "Rune name; also life and joy"),
+    ("life", "t", "rune meaning", "Trye", "Rune name; also light and joy"),
+    ("joy", "t", "rune meaning", "Trye", "Rune name; also light and life"),
+    ("sun", "d", "rune meaning", "Drye", "Rune name"),
+    ("heat", "f", "rune meaning", "Frey", "Rune name"),
+    ("fire", "v", "rune meaning", "Vey", "Rune name"),
+    ("air", "i", "rune meaning", "Ave", "Rune name"),
+    ("cloud", "e", "rune meaning", "Eve", "Rune name"),
+    ("water", "w", "rune meaning", "Uan", "Rune name"),
+    ("rain", "W", "rune meaning", "Uan", "Rune name"),
+    ("earth", "R", "rune meaning", "T’r", "Rune name"),
+    ("stone", "R", "rune meaning", "T’r", "Rune name"),
+    ("lava", "A", "rune meaning", "Aine", "Rune name"),
+    ("lightning", "L", "rune meaning", "L’v", "Rune name"),
+    ("cold", "s", "rune meaning", "Syle", "Rune name"),
+    ("ice", "Z", "rune meaning", "Zyle", "Rune name"),
+    ("plant", "p", "rune meaning", "Pl’v", "Rune name"),
+    ("wood", "B", "rune meaning", "Bl’v", "Rune name"),
+    ("dark", "k", "rune meaning", "Kor", "Rune name; also death and misery"),
+    ("death", "k", "rune meaning", "Kor", "Rune name; also dark and misery"),
+    ("misery", "k", "rune meaning", "Kor", "Rune name; also dark and death"),
+    ("moon", "K", "rune meaning", "Kor", "Rune name"),
+    ("yet", "G", "rune meaning", "Gyur", "Rune name"),
+    ("and", "H", "rune meaning", "Yhol", "Rune name"),
+    ("to", "j", "rune meaning", "Jhu", "Rune name"),
+    ("from", "J", "rune meaning", "Zhu", "Rune name; also of"),
+    ("of", "J", "rune meaning", "Zhu", "Rune name; also from"),
+    ("or", "n", "rune meaning", "Nur", "Rune name"),
+    ("nor", "m", "rune meaning", "Mur", "Rune name"),
+    ("so", "u", "rune meaning", "Urd", "Rune name"),
+    ("but", "O", "rune meaning", "Ord", "Rune name"),
+    ("for", "y", "rune meaning", "Yere", "Rune name"),
     ("I", "ni", "pronoun", "Nai", ""),
     ("you", "uz", "pronoun", "Uze", "Singular, very informal"),
     ("you", "us", "pronoun", "Usse", "Singular, informal"),
@@ -100,6 +100,15 @@ SOURCE_CONJUGATIONS = [
     ("past", "", "n", "Past = pronoun + verb + n"),
     ("future", "", "m", "Future = pronoun + verb + m"),
 ]
+# In compounds/affixes, a rune contributes its phonetic sound. A standalone
+# rune used as a word instead uses that rune's name from its lexicon entry.
+RUNE_PRONUNCIATIONS = {
+    "t": "t", "d": "d", "f": "f", "v": "v", "i": "e͡ɪ", "e": "iː",
+    "w": "w", "W": "w", "R": "ɹ", "A": "a͡ɪ", "L": "l", "s": "s", "Z": "z",
+    "p": "p", "B": "b", "k": "k", "K": "k", "G": "g", "H": "h",
+    "j": "d͡ʒ", "J": "d͡ʒ", "n": "n", "m": "m", "u": "u",
+    "O": "o͡ʊ", "y": "j",
+}
 
 app = Flask(__name__)
 app.config["DATABASE"] = DATABASE
@@ -175,6 +184,7 @@ def initialize_db():
             target_language TEXT NOT NULL REFERENCES languages(code),
             original_text TEXT NOT NULL,
             translated_text TEXT NOT NULL,
+            pronunciation_text TEXT NOT NULL DEFAULT '',
             unknown_words TEXT NOT NULL DEFAULT '',
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
@@ -236,6 +246,15 @@ def initialize_db():
            WHERE english_norm = 'no' AND faeric_norm = 'ni'
              AND part_of_speech = 'answer'"""
     )
+    # Single runes used as whole words are pronounced by rune name. Their
+    # phonetic values remain in RUNE_PRONUNCIATIONS for use inside compounds.
+    for english, faeric, pos, pronunciation, notes in SOURCE_LEXICON:
+        if pos == "rune meaning" and len(faeric) == 1 and pronunciation:
+            db.execute(
+                """UPDATE lexicon_entries SET pronunciation = ?, notes = ?
+                   WHERE english_norm = ? AND faeric_norm = ? AND part_of_speech = ?""",
+                (pronunciation, notes, normalize_english(english), normalize_faeric(faeric), pos),
+            )
     db.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_lexicon_pair "
         "ON lexicon_entries(english_norm, faeric_norm)"
@@ -250,6 +269,13 @@ def initialize_db():
     ):
         if column not in rule_columns:
             db.execute(f"ALTER TABLE language_rules ADD COLUMN {column} {declaration}")
+
+    history_columns = {row["name"] for row in db.execute("PRAGMA table_info(translation_history)")}
+    if "pronunciation_text" not in history_columns:
+        db.execute(
+            "ALTER TABLE translation_history ADD COLUMN pronunciation_text "
+            "TEXT NOT NULL DEFAULT ''"
+        )
 
     db.executemany(
         "INSERT OR IGNORE INTO languages (code, name) VALUES (?, ?)",
@@ -316,18 +342,38 @@ def find_english_verb(word, verb_entries, allow_past=False):
     return None, None
 
 
-def preferred_pronoun(rows, direction):
-    target_field = "faeric" if direction == "en_to_fae" else "english"
+def preferred_entry(rows, direction):
     candidates = [row for row in rows if row["part_of_speech"] == "pronoun"]
     if not candidates:
-        return rows[0][target_field]
+        return rows[0]
     # "you" has several politeness and number variants. Use the documented
     # neutral singular form as the default when translating from English.
     if direction == "en_to_fae":
         neutral = [row for row in candidates if "singular, neutral" in row["notes"].casefold()]
         if neutral:
-            return neutral[0][target_field]
-    return candidates[0][target_field]
+            return neutral[0]
+    return candidates[0]
+
+
+def preferred_pronoun(rows, direction):
+    target_field = "faeric" if direction == "en_to_fae" else "english"
+    return preferred_entry(rows, direction)[target_field]
+
+
+def pronunciation_for_affix(value):
+    return "".join(RUNE_PRONUNCIATIONS.get(char) or char for char in value)
+
+
+def pronunciation_for_word(entry, fallback):
+    if len(entry["faeric"]) == 1:
+        return entry["pronunciation"] or "[rune name not set]"
+    return entry["pronunciation"] or pronunciation_for_affix(entry["faeric"]) or fallback
+
+
+def pronunciation_for_component(entry):
+    if len(entry["faeric"]) == 1:
+        return pronunciation_for_affix(entry["faeric"])
+    return entry["pronunciation"] or entry["faeric"]
 
 
 def translate_text(text, direction, entries, rules, conjugations):
@@ -341,6 +387,7 @@ def translate_text(text, direction, entries, rules, conjugations):
     verb_entries = [row for row in entries if row["part_of_speech"] == "verb"]
     pronoun_entries = [row for row in entries if row["part_of_speech"] == "pronoun"]
     translated = []
+    pronunciation_pieces = []
     unknown = []
 
     if forward:
@@ -349,6 +396,7 @@ def translate_text(text, direction, entries, rules, conjugations):
         raw_pieces = TOKEN_RE.findall(text)
         index = 0
         generated_forms = set()
+        generated_pronunciations = {}
         while index < len(raw_pieces):
             piece = raw_pieces[index]
             pronouns = words.get(normalize_english(piece), []) if piece.isalnum() else []
@@ -374,7 +422,8 @@ def translate_text(text, direction, entries, rules, conjugations):
                             (rule for rule in conjugations if rule["tense"] == tense), None
                         )
                         if conjugation is not None:
-                            faeric_pronoun = preferred_pronoun(pronouns, direction)
+                            pronoun_entry = preferred_entry(pronouns, direction)
+                            faeric_pronoun = pronoun_entry["faeric"]
                             form = (
                                 conjugation["prefix"]
                                 + faeric_pronoun
@@ -382,7 +431,22 @@ def translate_text(text, direction, entries, rules, conjugations):
                                 + conjugation["suffix"]
                             )
                             translated.append(form)
-                            generated_forms.add(normalize_faeric(form))
+                            form_key = normalize_faeric(form)
+                            generated_forms.add(form_key)
+                            pronunciation_parts = []
+                            if conjugation["prefix"]:
+                                pronunciation_parts.append(
+                                    pronunciation_for_affix(conjugation["prefix"])
+                                )
+                            pronunciation_parts.append(
+                                pronunciation_for_component(pronoun_entry)
+                            )
+                            pronunciation_parts.append(pronunciation_for_component(verb))
+                            if conjugation["suffix"]:
+                                pronunciation_parts.append(
+                                    pronunciation_for_affix(conjugation["suffix"])
+                                )
+                            generated_pronunciations[form_key] = " ".join(pronunciation_parts)
                             index = j + 1
                             continue
             translated.append(piece)
@@ -438,20 +502,28 @@ def translate_text(text, direction, entries, rules, conjugations):
     for piece_index, piece in enumerate(pieces):
         if not piece or piece.isspace() or not any(char.isalnum() for char in piece):
             translated.append(piece)
+            if forward:
+                pronunciation_pieces.append(piece)
             continue
 
         normalized = normalize_english(piece) if forward else normalize_faeric(piece)
-        if forward and normalized in conjugated_forms:
+        if forward and normalize_faeric(piece) in conjugated_forms:
             translated.append(piece)
+            pronunciation_pieces.append(
+                generated_pronunciations.get(normalize_faeric(piece), piece)
+            )
             continue
         if not forward and piece_index in conjugated_forms:
             translated.append(conjugated_forms[piece_index])
             continue
         candidates = words.get(normalized, [])
         result = None
+        result_pronunciation = None
         if candidates:
             if forward:
-                result = preferred_pronoun(candidates, direction)
+                chosen = preferred_entry(candidates, direction)
+                result = chosen[target_key]
+                result_pronunciation = pronunciation_for_word(chosen, result)
             else:
                 # Keep real homonyms visible instead of silently choosing one.
                 result = " / ".join(dict.fromkeys(row[target_key] for row in candidates))
@@ -464,16 +536,27 @@ def translate_text(text, direction, entries, rules, conjugations):
                     stem = normalized[: -len(in_suffix)]
                     stem_rows = words.get(stem)
                     if stem_rows:
-                        stem_translation = preferred_pronoun(stem_rows, direction)
+                        chosen = preferred_entry(stem_rows, direction)
+                        stem_translation = chosen[target_key]
                         result = stem_translation + out_suffix
+                        if forward:
+                            pronunciation_parts = [pronunciation_for_component(chosen)]
+                            if out_suffix:
+                                pronunciation_parts.append(pronunciation_for_affix(out_suffix))
+                            result_pronunciation = " ".join(pronunciation_parts)
                         break
         if result is None:
             translated.append(piece)
             unknown.append(piece)
+            if forward:
+                pronunciation_pieces.append(piece)
         else:
             translated.append(result)
+            if forward:
+                pronunciation_pieces.append(result_pronunciation or result)
 
-    return "".join(translated), list(dict.fromkeys(unknown))
+    pronunciation = "".join(pronunciation_pieces) if forward else ""
+    return "".join(translated), list(dict.fromkeys(unknown)), pronunciation
 
 
 def page_data():
@@ -490,6 +573,7 @@ def page_data():
 def translate():
     db = get_db()
     result = None
+    pronunciation = None
     unknown_words = []
     message = None
     original = ""
@@ -514,15 +598,15 @@ def translate():
             conjugations = db.execute(
                 "SELECT * FROM language_rules WHERE enabled = 1 AND kind = 'conjugation'"
             ).fetchall()
-            result, unknown_words = translate_text(
+            result, unknown_words, pronunciation = translate_text(
                 original, direction, entries, rules, conjugations
             )
             source, target = ("en", "fae") if direction == "en_to_fae" else ("fae", "en")
             db.execute(
                 "INSERT INTO translation_history "
-                "(source_language, target_language, original_text, translated_text, unknown_words) "
-                "VALUES (?, ?, ?, ?, ?)",
-                (source, target, original, result, ", ".join(unknown_words)),
+                "(source_language, target_language, original_text, translated_text, "
+                "pronunciation_text, unknown_words) VALUES (?, ?, ?, ?, ?, ?)",
+                (source, target, original, result, pronunciation, ", ".join(unknown_words)),
             )
             db.commit()
 
@@ -532,6 +616,7 @@ def translate():
     return render_template(
         "translate.html",
         result=result,
+        pronunciation=pronunciation,
         unknown_words=unknown_words,
         message=message,
         original=original,

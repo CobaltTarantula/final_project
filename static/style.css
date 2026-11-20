@@ -38,6 +38,8 @@ select, input, textarea { font: inherit; color: var(--ink); }
 textarea { width: 100%; min-height: 98px; flex: 1; resize: vertical; border: 0; outline: 0; padding: 0; background: transparent; }
 textarea::placeholder, .placeholder-result { color: #8a948b; }
 .translation-result, .placeholder-result { margin: 4px 0; font-size: 18px; overflow-wrap: anywhere; }
+.pronunciation-result { display: flex; flex-direction: column; gap: 2px; margin: 3px 0 8px; color: var(--ink); font-size: 13px; overflow-wrap: anywhere; }
+.pronunciation-result .field-label { margin: 0; }
 .field-hint, .unknown-note { margin: auto 0 0; color: var(--muted); font-size: 12px; }
 .unknown-note { color: #765b2d; }
 .primary-button { display: inline-flex; align-items: center; justify-content: center; margin-top: 15px; padding: 10px 17px; border: 0; border-radius: 8px; background: var(--green); color: #fff; font: inherit; font-weight: 550; cursor: pointer; }
@@ -47,6 +49,8 @@ textarea::placeholder, .placeholder-result { color: #8a948b; }
 .section-heading a, .section-heading span { font-size: 12px; color: var(--muted); text-decoration: none; }
 .recent-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 13px; }
 .recent-row time, time { color: var(--muted); font-size: 11px; }
+.recent-result { display: flex; flex-direction: column; gap: 3px; }
+.recent-result small, .pronunciation-text { color: var(--muted); font-size: 11px; }
 .empty-state { padding: 15px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 .notice { margin: 0 0 18px; padding: 10px 12px; border-radius: 8px; color: var(--green); background: var(--green-soft); font-size: 14px; }
 .entry-form { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding: 17px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); }
