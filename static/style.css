@@ -30,8 +30,9 @@ h1 { margin: 0 0 7px; font-size: 28px; line-height: 1.2; font-weight: 550; lette
 h2 { margin: 0; font-size: 16px; font-weight: 550; }
 .subtitle { margin: 0 0 26px; color: var(--muted); }
 .direction-row { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; font-size: 13px; color: var(--muted); }
-select, input, textarea { font: inherit; color: var(--ink); }
-.direction-row select { padding: 6px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+select, input, textarea, button { font: inherit; color: var(--ink); }
+.swap-direction { padding: 6px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); cursor: pointer; }
+.swap-direction:hover { background: var(--green-soft); }
 .language-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .language-box { min-height: 184px; padding: 14px 15px 12px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); }
 .field-label { margin-bottom: 9px; color: var(--muted); font-size: 12px; }

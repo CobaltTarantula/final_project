@@ -6,27 +6,28 @@
   {% if message %}<p class="notice" role="alert">{{ message }}</p>{% endif %}
   <form method="post" class="translator-form">
     <div class="direction-row">
-      <label for="direction">Translate</label>
-      <select id="direction" name="direction">
-        <option value="en_to_fae" {% if direction == 'en_to_fae' %}selected{% endif %}>English → Faeric</option>
-        <option value="fae_to_en" {% if direction == 'fae_to_en' %}selected{% endif %}>Faeric → English</option>
-      </select>
+      <span>Translate</span>
+      <input type="hidden" id="direction" name="direction" value="{{ direction }}">
+      <span id="direction-name" aria-live="polite">{% if direction == 'en_to_fae' %}English → Faeric{% else %}Faeric → English{% endif %}</span>
+      <button class="swap-direction" id="swap-direction" type="button" aria-label="Switch translation direction" aria-pressed="{% if direction == 'fae_to_en' %}true{% else %}false{% endif %}">⇄ Switch</button>
     </div>
     <div class="language-panels">
       <label class="language-box" for="text">
-        <span class="field-label">{% if direction == 'en_to_fae' %}English{% else %}Faeric{% endif %}</span>
-        <textarea id="text" name="text" maxlength="500" placeholder="Type a word or short sentence…" required>{{ original }}</textarea>
+        <span class="field-label" id="source-language-label">{% if direction == 'en_to_fae' %}English{% else %}Faeric{% endif %}</span>
+        <textarea id="text" name="text" maxlength="500" class="{% if direction == 'fae_to_en' %}faeric-text{% endif %}" placeholder="{% if direction == 'en_to_fae' %}Type an English word or short sentence…{% else %}Type Faeric runes or Latin transliteration…{% endif %}" required>{{ original }}</textarea>
         <span class="field-hint">Up to 500 characters</span>
       </label>
       <section class="language-box result-box" aria-live="polite" aria-label="Translation result">
-        <span class="field-label">{% if direction == 'en_to_fae' %}Faeric{% else %}English{% endif %}</span>
-        {% if result is not none %}
-          <p class="translation-result {% if direction == 'en_to_fae' %}faeric-text{% endif %}">{{ result }}</p>
-          {% if direction == 'en_to_fae' and pronunciation %}<p class="pronunciation-result"><span class="field-label">Pronunciation / Latin transliteration</span><span>{{ pronunciation }}</span></p>{% endif %}
-          {% if unknown_words %}<p class="unknown-note">Not found in lexicon: {{ unknown_words | join(", ") }}</p>{% else %}<p class="field-hint">All words matched your lexicon or rules.</p>{% endif %}
-        {% else %}
-          <p class="placeholder-result">Your translation will appear here.</p>
-        {% endif %}
+        <span class="field-label" id="target-language-label">{% if direction == 'en_to_fae' %}Faeric{% else %}English{% endif %}</span>
+        <div id="translation-content">
+          {% if result is not none %}
+            <p class="translation-result {% if direction == 'en_to_fae' %}faeric-text{% endif %}">{{ result }}</p>
+            {% if direction == 'en_to_fae' and pronunciation %}<p class="pronunciation-result"><span class="field-label">Pronunciation / Latin transliteration</span><span>{{ pronunciation }}</span></p>{% endif %}
+            {% if unknown_words %}<p class="unknown-note">Not found in lexicon: {{ unknown_words | join(", ") }}</p>{% else %}<p class="field-hint">All words matched your lexicon or rules.</p>{% endif %}
+          {% else %}
+            <p class="placeholder-result">Your translation will appear here.</p>
+          {% endif %}
+        </div>
       </section>
     </div>
     <button class="primary-button" type="submit">Translate phrase</button>
@@ -40,4 +41,35 @@
       {% endfor %}
     {% else %}<p class="empty-state">Your saved translations will show up here.</p>{% endif %}
   </section>
+  <script>
+    (() => {
+      const direction = document.getElementById("direction");
+      const switchButton = document.getElementById("swap-direction");
+      const directionName = document.getElementById("direction-name");
+      const sourceLabel = document.getElementById("source-language-label");
+      const targetLabel = document.getElementById("target-language-label");
+      const sourceText = document.getElementById("text");
+      const output = document.getElementById("translation-content");
+
+      switchButton.addEventListener("click", () => {
+        const toFaeric = direction.value === "fae_to_en";
+        direction.value = toFaeric ? "en_to_fae" : "fae_to_en";
+        const sourceLanguage = toFaeric ? "English" : "Faeric";
+        const targetLanguage = toFaeric ? "Faeric" : "English";
+        sourceLabel.textContent = sourceLanguage;
+        targetLabel.textContent = targetLanguage;
+        directionName.textContent = `${sourceLanguage} → ${targetLanguage}`;
+        sourceText.placeholder = toFaeric
+          ? "Type an English word or short sentence…"
+          : "Type Faeric runes or Latin transliteration…";
+        sourceText.classList.toggle("faeric-text", !toFaeric);
+        switchButton.setAttribute("aria-pressed", String(!toFaeric));
+
+        const placeholder = document.createElement("p");
+        placeholder.className = "placeholder-result";
+        placeholder.textContent = "Your translation will appear here.";
+        output.replaceChildren(placeholder);
+      });
+    })();
+  </script>
 {% endblock %}
