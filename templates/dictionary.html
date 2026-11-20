@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Dictionary · Faeric{% endblock %}
+{% block content %}
+  <h1>Dictionary</h1>
+  <p class="subtitle">Add vocabulary pairs to the lexicon used by the translator.</p>
+  {% if message %}<p class="notice" role="status">{{ message }}</p>{% endif %}
+  <form method="post" class="entry-form">
+    <label>English word or phrase<input name="english" maxlength="120" required></label>
+    <label>Faeric word or phrase<input name="faeric" maxlength="120" required></label>
+    <label>Pronunciation <span class="optional">(optional)</span><input name="pronunciation" maxlength="120" placeholder="Pronunciation guide"></label>
+    <label>Part of speech <span class="optional">(optional)</span><input name="part_of_speech" maxlength="120" placeholder="noun, verb, adjective…"></label>
+    <label>Notes <span class="optional">(optional)</span><input name="notes" maxlength="120" placeholder="Pronunciation or usage note"></label>
+    <button class="primary-button" type="submit">Add word</button>
+  </form>
+  <section class="list-section">
+    <div class="section-heading"><h2>Lexicon entries</h2><span>{{ entries|length }} terms</span></div>
+    {% if entries %}
+      <div class="table-wrap"><table><thead><tr><th>English</th><th>Faeric</th><th>Pronunciation</th><th>Part of speech</th><th>Notes</th><th><span class="visually-hidden">Actions</span></th></tr></thead><tbody>
+        {% for entry in entries %}<tr><td>{{ entry.english }}</td><td class="faeric-text">{{ entry.faeric }}</td><td>{{ entry.pronunciation or "—" }}</td><td>{{ entry.part_of_speech or "—" }}</td><td>{{ entry.notes or "—" }}</td><td><form method="post" action="{{ url_for('delete_entry', entry_id=entry.id) }}"><button class="text-button" type="submit" aria-label="Delete {{ entry.english }} / {{ entry.faeric }}">Delete</button></form></td></tr>{% endfor %}
+      </tbody></table></div>
+    {% else %}<p class="empty-state">No words yet. Add a few entries to try the translator.</p>{% endif %}
+  </section>
+{% endblock %}

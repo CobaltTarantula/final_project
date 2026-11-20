@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Translate · Faeric{% endblock %}
+{% block content %}
+  <h1>Find the words</h1>
+  <p class="subtitle">Translate a word or short phrase using your Faeric vocabulary and rules.</p>
+  {% if message %}<p class="notice" role="alert">{{ message }}</p>{% endif %}
+  <form method="post" class="translator-form">
+    <div class="direction-row">
+      <label for="direction">Translate</label>
+      <select id="direction" name="direction">
+        <option value="en_to_fae" {% if direction == 'en_to_fae' %}selected{% endif %}>English → Faeric</option>
+        <option value="fae_to_en" {% if direction == 'fae_to_en' %}selected{% endif %}>Faeric → English</option>
+      </select>
+    </div>
+    <div class="language-panels">
+      <label class="language-box" for="text">
+        <span class="field-label">{% if direction == 'en_to_fae' %}English{% else %}Faeric{% endif %}</span>
+        <textarea id="text" name="text" maxlength="500" placeholder="Type a word or short sentence…" required>{{ original }}</textarea>
+        <span class="field-hint">Up to 500 characters</span>
+      </label>
+      <section class="language-box result-box" aria-live="polite" aria-label="Translation result">
+        <span class="field-label">{% if direction == 'en_to_fae' %}Faeric{% else %}English{% endif %}</span>
+        {% if result is not none %}
+          <p class="translation-result {% if direction == 'en_to_fae' %}faeric-text{% endif %}">{{ result }}</p>
+          {% if unknown_words %}<p class="unknown-note">Not found in lexicon: {{ unknown_words | join(", ") }}</p>{% else %}<p class="field-hint">All words matched your lexicon or rules.</p>{% endif %}
+        {% else %}
+          <p class="placeholder-result">Your translation will appear here.</p>
+        {% endif %}
+      </section>
+    </div>
+    <button class="primary-button" type="submit">Translate phrase</button>
+  </form>
+
+  <section class="recent-section">
+    <div class="section-heading"><h2>Recent translations</h2><a href="{{ url_for('history') }}">View history</a></div>
+    {% if recent %}
+      {% for row in recent %}
+        <div class="recent-row"><span class="{% if row.source_language == 'fae' %}faeric-text{% endif %}">{{ row.original_text }}</span><span class="{% if row.target_language == 'fae' %}faeric-text{% endif %}">{{ row.translated_text }}</span><time>{{ row.created_at }}</time></div>
+      {% endfor %}
+    {% else %}<p class="empty-state">Your saved translations will show up here.</p>{% endif %}
+  </section>
+{% endblock %}

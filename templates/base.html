@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Faeric Translator{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="{{ url_for('translate') }}"><span class="brand-mark" aria-hidden="true">ᚠ</span> Faeric</a>
+      <nav aria-label="Main navigation">
+        <a class="{% if request.endpoint == 'translate' %}active{% endif %}" href="{{ url_for('translate') }}">Translate</a>
+        <a class="{% if request.endpoint == 'dictionary' %}active{% endif %}" href="{{ url_for('dictionary') }}">Dictionary</a>
+        <a class="{% if request.endpoint == 'rules' %}active{% endif %}" href="{{ url_for('rules') }}">Rules</a>
+        <a class="{% if request.endpoint == 'history' %}active{% endif %}" href="{{ url_for('history') }}">History</a>
+      </nav>
+    </header>
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="footer"><span>{{ entry_count }} lexicon entries</span><span>{{ rule_count }} active rules</span><span>Local SQLite database</span></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Language rules · Faeric{% endblock %}
+{% block content %}
+  <h1>Language rules</h1>
+  <p class="subtitle">The translator applies the conjugation patterns from your Faeric guide, then checks saved suffix mappings.</p>
+  {% if message %}<p class="notice" role="status">{{ message }}</p>{% endif %}
+  <div class="rule-explainer"><strong>Verb conjugation from the source guide</strong><p>For a known subject pronoun followed by a known verb, the translator builds one Faeric verb form from the saved rule and both lexicon entries. English simple past forms ending in “-ed” and future phrases using “will” select the past and future patterns; other recognized verbs use present.</p></div>
+  <div class="table-wrap"><table><thead><tr><th>Tense</th><th>Faeric form</th><th>Source rule</th></tr></thead><tbody>
+    {% for rule in conjugations %}<tr><td>{{ rule.name }}</td><td><code>{% if rule.tense == 'present' %}{{ rule.prefix }} + pronoun + verb{% else %}pronoun + verb + {{ rule.suffix }}{% endif %}</code></td><td>{{ rule.description }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="rule-explainer"><strong>Optional suffix mappings</strong><p>These apply to a word after exact lexicon lookup. For an English → Faeric translation, the app removes the English suffix, looks up the stem, and adds the Faeric suffix. Reverse translation applies the inverse mapping.</p></div>
+  <form method="post" class="entry-form">
+    <label>Rule name<input name="name" maxlength="80" placeholder="Plural" required></label>
+    <label>English suffix<input name="source_suffix" maxlength="80" placeholder="s" required></label>
+    <label>Faeric suffix<input name="target_suffix" maxlength="80" placeholder="i" required></label>
+    <label>Description <span class="optional">(optional)</span><input name="description" maxlength="80" placeholder="How this inflection is used"></label>
+    <button class="primary-button" type="submit">Add rule</button>
+  </form>
+  <section class="list-section">
+    <div class="section-heading"><h2>Saved suffix mappings</h2><span>{{ rules|length }} total</span></div>
+    {% if rules %}<div class="table-wrap"><table><thead><tr><th>Name</th><th>English suffix</th><th>Faeric suffix</th><th>Description</th><th></th></tr></thead><tbody>
+      {% for rule in rules %}<tr><td>{{ rule.name }}</td><td><code>{{ rule.source_suffix }}</code></td><td><code>{{ rule.target_suffix }}</code></td><td>{{ rule.description or "—" }}</td><td><form method="post" action="{{ url_for('delete_rule', rule_id=rule.id) }}"><button class="text-button" type="submit" aria-label="Delete {{ rule.name }}">Delete</button></form></td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="empty-state">No optional suffix mappings saved. The three conjugation patterns from your source guide remain active.</p>{% endif %}
+  </section>
+{% endblock %}
