@@ -109,6 +109,7 @@ RUNE_PRONUNCIATIONS = {
     "j": "d͡ʒ", "J": "d͡ʒ", "n": "n", "m": "m", "u": "u",
     "O": "o͡ʊ", "y": "j",
 }
+IRREGULAR_PAST_FORMS = {"hold": "held"}
 
 app = Flask(__name__)
 app.config["DATABASE"] = DATABASE
@@ -306,6 +307,8 @@ def initialize_db():
 
 def english_verb_form(lemma, tense):
     if tense == "past":
+        if lemma in IRREGULAR_PAST_FORMS:
+            return IRREGULAR_PAST_FORMS[lemma]
         if lemma.endswith("e"):
             return lemma + "d"
         if len(lemma) > 1 and lemma.endswith("y") and lemma[-2] not in "aeiou":
@@ -329,6 +332,12 @@ def find_english_verb(word, verb_entries, allow_past=False):
             for row in verb_entries:
                 if candidate == row["english_norm"]:
                     return row, "present"
+    if allow_past:
+        for lemma, past_form in IRREGULAR_PAST_FORMS.items():
+            if normalized == past_form:
+                match = next((row for row in verb_entries if row["english_norm"] == lemma), None)
+                if match is not None:
+                    return match, "past"
     if allow_past and normalized.endswith("ed"):
         candidates = [normalized[:-2], normalized[:-2] + "e", normalized[:-1]]
         if len(candidates[0]) > 1 and candidates[0][-1] == candidates[0][-2]:
@@ -446,7 +455,7 @@ def translate_text(text, direction, entries, rules, conjugations):
                                 pronunciation_parts.append(
                                     pronunciation_for_affix(conjugation["suffix"])
                                 )
-                            generated_pronunciations[form_key] = " ".join(pronunciation_parts)
+                            generated_pronunciations[form_key] = "".join(pronunciation_parts).lower()
                             index = j + 1
                             continue
             translated.append(piece)
