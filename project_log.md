@@ -8,4 +8,5 @@
 | 11/18/26 | Initial ERD ideas | 0.5 |
 | 11/18/26 | Finished Pitch | 0.5|
 | 11/18/26 | Finished Initial design | 0.25 |
+| 11/19/26 | Local run of app can translate English to Faeric characters | 0.5 |
 | **Total** |   | **4.25** |
