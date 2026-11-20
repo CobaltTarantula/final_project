@@ -12,12 +12,28 @@
     <label>Notes <span class="optional">(optional)</span><input name="notes" maxlength="120" placeholder="Pronunciation or usage note"></label>
     <button class="primary-button" type="submit">Add word</button>
   </form>
+  <form method="post" action="{{ url_for('import_dictionary') }}" enctype="multipart/form-data" class="import-form">
+    <label>Import a large lexicon from CSV<input type="file" name="file" accept=".csv,text/csv" required></label>
+    <p class="field-hint">CSV columns: English, Faeric. Optional columns: pronunciation, part_of_speech, notes. UTF-8 encoding.</p>
+    <button class="secondary-button" type="submit">Import CSV</button>
+  </form>
   <section class="list-section">
-    <div class="section-heading"><h2>Lexicon entries</h2><span>{{ entries|length }} terms</span></div>
+    <div class="section-heading"><h2>Lexicon entries</h2><span>{{ total_entries }} matching terms · page {{ page }} of {{ page_count }}</span></div>
+    <form method="get" class="dictionary-search">
+      <label for="dictionary-query">Find by English or Faeric prefix</label>
+      <input id="dictionary-query" name="q" value="{{ search }}" maxlength="120" placeholder="Search the dictionary">
+      <button class="secondary-button" type="submit">Search</button>
+      {% if search %}<a href="{{ url_for('dictionary') }}">Clear</a>{% endif %}
+    </form>
     {% if entries %}
       <div class="table-wrap"><table><thead><tr><th>English</th><th>Faeric</th><th>Pronunciation</th><th>Part of speech</th><th>Notes</th><th><span class="visually-hidden">Actions</span></th></tr></thead><tbody>
-        {% for entry in entries %}<tr><td>{{ entry.english }}</td><td class="faeric-text">{{ entry.faeric }}</td><td>{{ entry.pronunciation or "—" }}</td><td>{{ entry.part_of_speech or "—" }}</td><td>{{ entry.notes or "—" }}</td><td><form method="post" action="{{ url_for('delete_entry', entry_id=entry.id) }}"><button class="text-button" type="submit" aria-label="Delete {{ entry.english }} / {{ entry.faeric }}">Delete</button></form></td></tr>{% endfor %}
+        {% for entry in entries %}<tr><td>{{ entry.english }}</td><td class="faeric-text">{{ entry.faeric }}</td><td>{{ entry.pronunciation or "—" }}</td><td>{{ entry.part_of_speech or "—" }}</td><td>{{ entry.notes or "—" }}</td><td><form method="post" action="{{ url_for('delete_entry', entry_id=entry.id) }}"><input type="hidden" name="page" value="{{ page }}"><input type="hidden" name="q" value="{{ search }}"><button class="text-button" type="submit" aria-label="Delete {{ entry.english }} / {{ entry.faeric }}">Delete</button></form></td></tr>{% endfor %}
       </tbody></table></div>
-    {% else %}<p class="empty-state">No words yet. Add a few entries to try the translator.</p>{% endif %}
+      {% if page_count > 1 %}<nav class="pagination" aria-label="Dictionary pages">
+        {% if page > 1 %}<a href="{{ url_for('dictionary', q=search, page=page - 1) }}">Previous</a>{% endif %}
+        <span>Page {{ page }} of {{ page_count }}</span>
+        {% if page < page_count %}<a href="{{ url_for('dictionary', q=search, page=page + 1) }}">Next</a>{% endif %}
+      </nav>{% endif %}
+    {% else %}<p class="empty-state">{% if search %}No entries start with that text.{% else %}No words yet. Add a few entries or import a CSV to get started.{% endif %}</p>{% endif %}
   </section>
 {% endblock %}

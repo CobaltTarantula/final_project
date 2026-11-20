@@ -1,5 +1,7 @@
 """A small local English/Faeric translator backed by SQLite."""
 
+import csv
+import io
 import re
 import sqlite3
 import unicodedata
@@ -12,6 +14,8 @@ ROOT = Path(__file__).resolve().parent
 DATABASE = ROOT / "instance" / "faeric.sqlite3"
 TOKEN_RE = re.compile(r"\w+|[^\w\s]+|\s+", re.UNICODE)
 MAX_TEXT_LENGTH = 500
+LEXICON_PAGE_SIZE = 50
+LEXICON_LOOKUP_BATCH_SIZE = 500
 
 # Transcribed from sources/Fae Rune Pronunciation Guide and Dictionary.docx.
 # The Faeric spellings are the document's Latin-keyboard rune transcriptions.
@@ -154,6 +158,11 @@ def initialize_db():
             name TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS app_metadata (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS lexicon_entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             english TEXT NOT NULL,
@@ -234,10 +243,30 @@ def initialize_db():
         )
         db.execute("DROP TABLE lexicon_entries")
         db.execute("ALTER TABLE lexicon_entries_new RENAME TO lexicon_entries")
-    for entry in db.execute("SELECT id, english, faeric FROM lexicon_entries").fetchall():
+    normalization_version = db.execute(
+        "SELECT value FROM app_metadata WHERE key = 'lexicon_normalization_version'"
+    ).fetchone()
+    if normalization_version is None or normalization_version["value"] != "2":
+        last_id = 0
+        while True:
+            batch = db.execute(
+                "SELECT id, english, faeric FROM lexicon_entries "
+                "WHERE id > ? ORDER BY id LIMIT 2000",
+                (last_id,),
+            ).fetchall()
+            if not batch:
+                break
+            db.executemany(
+                "UPDATE lexicon_entries SET english_norm = ?, faeric_norm = ? WHERE id = ?",
+                [
+                    (normalize_english(row["english"]), normalize_faeric(row["faeric"]), row["id"])
+                    for row in batch
+                ],
+            )
+            last_id = batch[-1]["id"]
         db.execute(
-            "UPDATE lexicon_entries SET english_norm = ?, faeric_norm = ? WHERE id = ?",
-            (normalize_english(entry["english"]), normalize_faeric(entry["faeric"]), entry["id"]),
+            "INSERT OR REPLACE INTO app_metadata(key, value) "
+            "VALUES ('lexicon_normalization_version', '2')"
         )
     # Update the original source entry in databases initialized before the user
     # changed the Faeric form for "no" from ni / Nai to Mai.
@@ -259,6 +288,18 @@ def initialize_db():
     db.execute(
         "CREATE UNIQUE INDEX IF NOT EXISTS idx_lexicon_pair "
         "ON lexicon_entries(english_norm, faeric_norm)"
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_lexicon_english_norm "
+        "ON lexicon_entries(english_norm, id)"
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_lexicon_faeric_norm "
+        "ON lexicon_entries(faeric_norm, id)"
+    )
+    db.execute(
+        "CREATE INDEX IF NOT EXISTS idx_lexicon_pos_faeric "
+        "ON lexicon_entries(part_of_speech, faeric_norm)"
     )
 
     rule_columns = {row["name"] for row in db.execute("PRAGMA table_info(language_rules)")}
@@ -301,6 +342,10 @@ def initialize_db():
                )""",
             (tense.title(), tense, prefix, suffix, description, tense),
         )
+    db.execute(
+        "INSERT OR IGNORE INTO app_metadata(key, value) "
+        "SELECT 'lexicon_entry_count', CAST(COUNT(*) AS TEXT) FROM lexicon_entries"
+    )
     db.commit()
     db.close()
 
@@ -349,6 +394,111 @@ def find_english_verb(word, verb_entries, allow_past=False):
                 if candidate == row["english_norm"]:
                     return row, "past"
     return None, None
+
+
+def english_verb_lookup_candidates(word):
+    """Return likely English lemmas needed to recognize common inflections."""
+    normalized = normalize_english(word)
+    candidates = {normalized}
+    if normalized.endswith("s"):
+        candidates.add(normalized[:-1])
+        if normalized.endswith("es"):
+            candidates.add(normalized[:-2])
+    for lemma, past_form in IRREGULAR_PAST_FORMS.items():
+        if normalized == past_form:
+            candidates.add(lemma)
+    if normalized.endswith("ed"):
+        stem = normalized[:-2]
+        candidates.update((stem, stem + "e", normalized[:-1]))
+        if len(stem) > 1 and stem[-1] == stem[-2]:
+            candidates.add(stem[:-1])
+        if stem.endswith("i"):
+            candidates.add(stem[:-1] + "y")
+    return candidates
+
+
+def candidate_lexicon_keys(text, direction, rules):
+    """Build bounded lookup keys from the input, including possible phrases."""
+    pieces = TOKEN_RE.findall(text)
+    word_positions = [index for index, piece in enumerate(pieces) if piece.isalnum()]
+    normalize = normalize_english if direction == "en_to_fae" else normalize_faeric
+    keys = set()
+
+    for position_index, start in enumerate(word_positions):
+        word = pieces[start]
+        normalized_word = normalize(word)
+        keys.add(normalized_word)
+
+        if direction == "en_to_fae":
+            keys.update(english_verb_lookup_candidates(word))
+
+        for rule in rules:
+            source_suffix = (
+                rule["source_suffix"] if direction == "en_to_fae" else rule["target_suffix"]
+            )
+            suffix = normalize(source_suffix)
+            if suffix and normalized_word.endswith(suffix) and len(normalized_word) > len(suffix):
+                keys.add(normalized_word[:-len(suffix)])
+
+        # Dictionary entries may be words or phrases. Candidate phrases are
+        # drawn only from the submitted text, never from the whole lexicon.
+        for end in word_positions[position_index:]:
+            phrase = "".join(pieces[start:end + 1])
+            if len(phrase) > 120:
+                break
+            keys.add(normalize(phrase))
+
+    return keys
+
+
+def fetch_lexicon_entries(db, field, keys):
+    """Fetch only indexed lexicon keys present in this translation request."""
+    if field not in {"english_norm", "faeric_norm"}:
+        raise ValueError("Unsupported lexicon lookup field")
+    rows_by_id = {}
+    key_list = list(keys)
+    for start in range(0, len(key_list), LEXICON_LOOKUP_BATCH_SIZE):
+        batch = key_list[start:start + LEXICON_LOOKUP_BATCH_SIZE]
+        placeholders = ",".join("?" for _ in batch)
+        query = f"SELECT * FROM lexicon_entries WHERE {field} IN ({placeholders}) ORDER BY id"
+        for row in db.execute(query, batch):
+            rows_by_id[row["id"]] = row
+    return sorted(rows_by_id.values(), key=lambda row: row["id"])
+
+
+def lookup_entries_for_translation(db, text, direction, rules, conjugations):
+    """Look up matching words and phrases without loading the full dictionary."""
+    field = "english_norm" if direction == "en_to_fae" else "faeric_norm"
+    keys = candidate_lexicon_keys(text, direction, rules)
+
+    pronouns = []
+    if direction == "fae_to_en":
+        # Pronoun forms are needed to split fused Faeric conjugations into their
+        # pronoun and verb parts. This is a small indexed category, not the lexicon.
+        pronouns = db.execute(
+            "SELECT * FROM lexicon_entries WHERE part_of_speech = 'pronoun'"
+        ).fetchall()
+        pieces = TOKEN_RE.findall(text)
+        for piece in pieces:
+            if not piece.isalnum():
+                continue
+            normalized = normalize_faeric(piece)
+            for pronoun in pronouns:
+                for rule in conjugations:
+                    prefix = normalize_faeric(rule["prefix"] + pronoun["faeric"])
+                    suffix = normalize_faeric(rule["suffix"])
+                    if normalized.startswith(prefix) and (not suffix or normalized.endswith(suffix)):
+                        suffix_length = len(suffix) if suffix else 0
+                        end = len(normalized) - suffix_length if suffix_length else len(normalized)
+                        verb_key = normalized[len(prefix):end]
+                        if verb_key:
+                            keys.add(verb_key)
+
+    entries = fetch_lexicon_entries(db, field, keys)
+    if pronouns:
+        found_ids = {row["id"] for row in entries}
+        entries.extend(row for row in pronouns if row["id"] not in found_ids)
+    return entries
 
 
 def preferred_entry(rows, direction):
@@ -468,7 +618,7 @@ def translate_text(text, direction, entries, rules, conjugations):
         raw_pieces = TOKEN_RE.findall(text)
         conjugated_forms = {}
         # Recognize the source conjugation templates in reverse.
-        for index, piece in enumerate(raw_pieces):
+        for piece in raw_pieces:
             if not piece.isalnum():
                 continue
             normalized = normalize_faeric(piece)
@@ -484,11 +634,11 @@ def translate_text(text, direction, entries, rules, conjugations):
                         form = normalize_faeric(form)
                         if normalized == form:
                             english_verb = english_verb_form(verb["english"], rule["tense"])
-                            conjugated_forms[index] = pronoun["english"] + " " + english_verb
+                            conjugated_forms[normalized] = pronoun["english"] + " " + english_verb
                             break
-                    if index in conjugated_forms:
+                    if normalized in conjugated_forms:
                         break
-                if index in conjugated_forms:
+                if normalized in conjugated_forms:
                     break
 
     # Match saved multiword entries before tokenizing the remaining text.
@@ -522,8 +672,8 @@ def translate_text(text, direction, entries, rules, conjugations):
                 generated_pronunciations.get(normalize_faeric(piece), piece)
             )
             continue
-        if not forward and piece_index in conjugated_forms:
-            translated.append(conjugated_forms[piece_index])
+        if not forward and normalized in conjugated_forms:
+            translated.append(conjugated_forms[normalized])
             continue
         candidates = words.get(normalized, [])
         result = None
@@ -570,12 +720,28 @@ def translate_text(text, direction, entries, rules, conjugations):
 
 def page_data():
     db = get_db()
+    entry_count = db.execute(
+        "SELECT value FROM app_metadata WHERE key = 'lexicon_entry_count'"
+    ).fetchone()
     return {
-        "entry_count": db.execute("SELECT COUNT(*) FROM lexicon_entries").fetchone()[0],
+        "entry_count": int(entry_count["value"]) if entry_count else 0,
         "rule_count": db.execute(
             "SELECT COUNT(*) FROM language_rules WHERE enabled = 1"
         ).fetchone()[0],
     }
+
+
+def prefix_upper_bound(prefix):
+    """Return the exclusive Unicode sort bound for a BINARY prefix range."""
+    characters = list(prefix)
+    for index in range(len(characters) - 1, -1, -1):
+        codepoint = ord(characters[index])
+        if codepoint < 0x10FFFF:
+            next_codepoint = codepoint + 1
+            if 0xD800 <= next_codepoint <= 0xDFFF:
+                next_codepoint = 0xE000
+            return "".join(characters[:index]) + chr(next_codepoint)
+    return None
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -598,7 +764,6 @@ def translate():
         elif len(original) > MAX_TEXT_LENGTH:
             message = f"Keep phrases to {MAX_TEXT_LENGTH} characters or fewer."
         else:
-            entries = db.execute("SELECT * FROM lexicon_entries").fetchall()
             rules = db.execute(
                 "SELECT * FROM language_rules WHERE enabled = 1 AND kind = 'suffix' ORDER BY id"
             ).fetchall()
@@ -607,6 +772,9 @@ def translate():
             conjugations = db.execute(
                 "SELECT * FROM language_rules WHERE enabled = 1 AND kind = 'conjugation'"
             ).fetchall()
+            entries = lookup_entries_for_translation(
+                db, original, direction, rules, conjugations
+            )
             result, unknown_words, pronunciation = translate_text(
                 original, direction, entries, rules, conjugations
             )
@@ -657,27 +825,160 @@ def dictionary():
                     "VALUES (?, ?, ?, ?, ?, ?, ?)",
                     (english, faeric, normalize_english(english), normalize_faeric(faeric), part_of_speech, notes, pronunciation),
                 )
+                db.execute(
+                    "UPDATE app_metadata SET value = CAST(CAST(value AS INTEGER) + 1 AS TEXT) "
+                    "WHERE key = 'lexicon_entry_count'"
+                )
                 db.commit()
                 return redirect(url_for("dictionary", saved="1"))
             except sqlite3.IntegrityError:
                 message = "That exact English–Faeric pair is already in the lexicon."
 
+    search = request.args.get("q", "").strip()[:120]
+    page = request.args.get("page", default=1, type=int) or 1
+    page = max(1, page)
+    where = ""
+    parameters = []
+    if search:
+        english_prefix = normalize_english(search)
+        faeric_prefix = normalize_faeric(search)
+        english_upper = prefix_upper_bound(english_prefix)
+        faeric_upper = prefix_upper_bound(faeric_prefix)
+        english_clause = "(english_norm >= ? AND english_norm < ?)" if english_upper else "english_norm >= ?"
+        faeric_clause = "(faeric_norm >= ? AND faeric_norm < ?)" if faeric_upper else "faeric_norm >= ?"
+        where = f"WHERE {english_clause} OR {faeric_clause}"
+        parameters.extend((english_prefix, english_upper) if english_upper else (english_prefix,))
+        parameters.extend((faeric_prefix, faeric_upper) if faeric_upper else (faeric_prefix,))
+
+    total_entries = db.execute(
+        f"SELECT COUNT(*) FROM lexicon_entries {where}", parameters
+    ).fetchone()[0]
+    page_count = max(1, (total_entries + LEXICON_PAGE_SIZE - 1) // LEXICON_PAGE_SIZE)
+    page = min(page, page_count)
     entries = db.execute(
-        "SELECT * FROM lexicon_entries ORDER BY english_norm"
+        f"SELECT * FROM lexicon_entries {where} "
+        "ORDER BY english_norm, id LIMIT ? OFFSET ?",
+        [*parameters, LEXICON_PAGE_SIZE, (page - 1) * LEXICON_PAGE_SIZE],
     ).fetchall()
     if request.args.get("saved"):
         message = "Word added to your lexicon."
     if request.args.get("deleted"):
         message = "Word removed from your lexicon."
-    return render_template("dictionary.html", entries=entries, message=message, **page_data())
+    if request.args.get("import_error"):
+        message = request.args.get("import_error", "CSV import failed.")[:200]
+    if request.args.get("imported"):
+        message = (
+            f"Imported {request.args.get('imported')} entries; "
+            f"skipped {request.args.get('skipped', '0')} duplicates and "
+            f"{request.args.get('invalid', '0')} invalid rows."
+        )
+    return render_template(
+        "dictionary.html", entries=entries, message=message, search=search,
+        page=page, page_count=page_count, total_entries=total_entries, **page_data()
+    )
+
+
+@app.post("/dictionary/import")
+def import_dictionary():
+    upload = request.files.get("file")
+    if upload is None or not upload.filename:
+        return redirect(url_for("dictionary", import_error="Choose a CSV file."))
+
+    text_stream = io.TextIOWrapper(upload.stream, encoding="utf-8-sig", newline="")
+    reader = csv.DictReader(text_stream)
+    headers = {name.strip().casefold() for name in (reader.fieldnames or []) if name}
+    if not {"english", "faeric"}.issubset(headers):
+        return redirect(
+            url_for("dictionary", import_error="CSV needs English and Faeric columns.")
+        )
+
+    db = get_db()
+    imported = skipped = invalid = 0
+    batch = []
+    db.execute("BEGIN")
+    try:
+        for source_row in reader:
+            if any(key is None or not isinstance(value, str) for key, value in source_row.items()):
+                invalid += 1
+                continue
+            row = {
+                (key or "").strip().casefold(): (value or "").strip()
+                for key, value in source_row.items()
+            }
+            english = row.get("english", "")
+            faeric = row.get("faeric", "")
+            pronunciation = row.get("pronunciation", "")
+            part_of_speech = row.get("part_of_speech", "")
+            notes = row.get("notes", "")
+            values = (english, faeric, pronunciation, part_of_speech, notes)
+            if not english or not faeric or max(map(len, values)) > 120:
+                invalid += 1
+                continue
+            batch.append(
+                (
+                    english, faeric, normalize_english(english), normalize_faeric(faeric),
+                    part_of_speech, notes, pronunciation,
+                )
+            )
+            if len(batch) >= 1000:
+                before = db.total_changes
+                db.executemany(
+                    """INSERT OR IGNORE INTO lexicon_entries
+                       (english, faeric, english_norm, faeric_norm, part_of_speech, notes, pronunciation)
+                       VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    batch,
+                )
+                imported += db.total_changes - before
+                skipped += len(batch) - (db.total_changes - before)
+                batch.clear()
+
+        if batch:
+            before = db.total_changes
+            db.executemany(
+                """INSERT OR IGNORE INTO lexicon_entries
+                   (english, faeric, english_norm, faeric_norm, part_of_speech, notes, pronunciation)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                batch,
+            )
+            imported += db.total_changes - before
+            skipped += len(batch) - (db.total_changes - before)
+        db.execute(
+            "UPDATE app_metadata SET value = "
+            "CAST(CAST(value AS INTEGER) + ? AS TEXT) WHERE key = 'lexicon_entry_count'",
+            (imported,),
+        )
+        db.commit()
+    except (csv.Error, UnicodeDecodeError):
+        db.rollback()
+        return redirect(
+            url_for("dictionary", import_error="Could not read the CSV. Save it as UTF-8 and try again.")
+        )
+    finally:
+        text_stream.detach()
+
+    return redirect(
+        url_for("dictionary", imported=imported, skipped=skipped, invalid=invalid)
+    )
 
 
 @app.post("/dictionary/<int:entry_id>/delete")
 def delete_entry(entry_id):
     db = get_db()
-    db.execute("DELETE FROM lexicon_entries WHERE id = ?", (entry_id,))
+    deleted = db.execute("DELETE FROM lexicon_entries WHERE id = ?", (entry_id,)).rowcount
+    if deleted:
+        db.execute(
+            "UPDATE app_metadata SET value = "
+            "CAST(MAX(0, CAST(value AS INTEGER) - ?) AS TEXT) "
+            "WHERE key = 'lexicon_entry_count'",
+            (deleted,),
+        )
     db.commit()
-    return redirect(url_for("dictionary", deleted="1"))
+    return redirect(
+        url_for(
+            "dictionary", deleted="1", page=request.form.get("page", 1),
+            q=request.form.get("q", "")[:120]
+        )
+    )
 
 
 @app.route("/rules", methods=["GET", "POST"])

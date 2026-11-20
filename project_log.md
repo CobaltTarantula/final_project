@@ -12,4 +12,5 @@
 | 11/19/26 | Filled missing definitions of individual rune-words | 0.5|
 | 11/19/26 | Translation button fiddling, dictionary functionality and new words can be added | 0.5 |
 | 11/19/26 | Conjugation rules updated and corrected, design files moved to design folder | 0.5 |
-| **Total** |   | **6.25** |
+| 11/19/26 | Scaling for large lexicons, pagination of dictionary, allow for lexicon imports? | 0.5 |
+| **Total** |   | **6.75**|

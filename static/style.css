@@ -58,6 +58,16 @@ textarea::placeholder, .placeholder-result { color: #8a948b; }
 .entry-form label { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
 .entry-form input { min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); font-size: 14px; }
 .entry-form .primary-button { align-self: end; justify-self: start; margin-top: 0; }
+.import-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 16px; margin-top: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.import-form label, .dictionary-search label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; }
+.import-form input[type="file"] { max-width: 100%; font-size: 13px; }
+.import-form .field-hint { flex-basis: 100%; margin: 0; }
+.secondary-button { padding: 8px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); font: inherit; font-size: 13px; cursor: pointer; }
+.secondary-button:hover { background: var(--green-soft); }
+.dictionary-search { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; margin: 10px 0; }
+.dictionary-search input { min-width: min(280px, 100%); padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+.dictionary-search a, .pagination a { color: var(--green); font-size: 13px; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 16px; color: var(--muted); font-size: 12px; }
 .optional { color: #929a92; }
 .faeric-text { font-family: "Faeric Runes", Georgia, serif; font-size: 1.2em; }
 .table-wrap { overflow-x: auto; }
