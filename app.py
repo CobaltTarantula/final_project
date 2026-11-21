@@ -2,16 +2,19 @@
 
 import csv
 import io
+import os
 import re
 import sqlite3
 import unicodedata
 from pathlib import Path
 
-from flask import Flask, g, redirect, render_template, request, url_for
+from flask import Flask, g, jsonify, redirect, render_template, request, url_for
 
 
 ROOT = Path(__file__).resolve().parent
-DATABASE = ROOT / "instance" / "faeric.sqlite3"
+DATABASE = Path(
+    os.environ.get("FAERIC_DATABASE", ROOT / "instance" / "faeric.sqlite3")
+).expanduser().resolve()
 TOKEN_RE = re.compile(r"\w+|[^\w\s]+|\s+", re.UNICODE)
 MAX_TEXT_LENGTH = 500
 LEXICON_PAGE_SIZE = 50
@@ -116,7 +119,17 @@ RUNE_PRONUNCIATIONS = {
 IRREGULAR_PAST_FORMS = {"hold": "held"}
 
 app = Flask(__name__)
-app.config["DATABASE"] = DATABASE
+IS_PRODUCTION = os.environ.get("APP_ENV", "development").casefold() == "production"
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if IS_PRODUCTION and not SECRET_KEY:
+    raise RuntimeError("Set SECRET_KEY in the production environment before starting the app.")
+app.config.update(
+    DATABASE=DATABASE,
+    SECRET_KEY=SECRET_KEY or "local-development-only",
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=IS_PRODUCTION,
+)
 
 
 def normalize_english(value):
@@ -147,6 +160,13 @@ def close_db(_error=None):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+
+@app.get("/health")
+def health():
+    """Lightweight readiness endpoint for a hosting platform's health probe."""
+    get_db().execute("SELECT 1")
+    return jsonify(status="ok")
 
 
 def initialize_db():
