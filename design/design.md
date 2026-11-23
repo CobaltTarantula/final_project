@@ -59,3 +59,12 @@ Travel </br>
 
 ## UX
 ![img](ux-translate.png)
+
+## Artistic renders
+* Include options for rendering translations into cool pictures?
+* CS355 graphics type stuff?
+* Example: rock image in source files
+
+## DND Player Page
+* how proficient is your character?
+* use a metric to determine how much a person could use

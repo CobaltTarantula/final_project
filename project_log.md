@@ -16,4 +16,5 @@
 | 11/20/26 | Steps taken to prep for future deployment | 1.0 |
 | 11/22/26 | Goal reorientation and planning | 0.5 |
 | 11/22/26 | Add edit button for dictionary entries, Multiple English words mapping to one Faeric word, Multiple Faeric words mapping to one English word | 0.75 |
-| **Total** |   | **9.0**|
+| 11/23/26 | Design discussion in class | 0.25 |
+| **Total** |   | **9.25**|
