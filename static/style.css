@@ -58,6 +58,11 @@ textarea::placeholder, .placeholder-result { color: #8a948b; }
 .entry-form label { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
 .entry-form input { min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); font-size: 14px; }
 .entry-form .primary-button { align-self: end; justify-self: start; margin-top: 0; }
+.edit-actions { display: flex; align-items: center; gap: 14px; }
+.edit-actions .primary-button { margin-top: 0; }
+.entry-actions { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.edit-link { color: var(--green); font-size: 12px; text-decoration: none; }
+.edit-link:hover { text-decoration: underline; }
 .import-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 16px; margin-top: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .import-form label, .dictionary-search label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; }
 .import-form input[type="file"] { max-width: 100%; font-size: 13px; }

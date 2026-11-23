@@ -52,6 +52,11 @@ Travel </br>
 ## Diagram
 ![img](/diagram.png)
 
+## New Ideas
+Add edit button for dictionary entries
+Multiple English words mapping to one Faeric word
+Multiple Faeric words mapping to one English word
+
 # Future Codex Prompts
 
 # Scaling and End Goal

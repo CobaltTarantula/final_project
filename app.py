@@ -8,7 +8,7 @@ import sqlite3
 import unicodedata
 from pathlib import Path
 
-from flask import Flask, g, jsonify, redirect, render_template, request, url_for
+from flask import Flask, abort, g, jsonify, redirect, render_template, request, url_for
 
 
 ROOT = Path(__file__).resolve().parent
@@ -852,6 +852,7 @@ def dictionary():
                 db.commit()
                 return redirect(url_for("dictionary", saved="1"))
             except sqlite3.IntegrityError:
+                db.rollback()
                 message = "That exact English–Faeric pair is already in the lexicon."
 
     search = request.args.get("q", "").strip()[:120]
@@ -884,6 +885,8 @@ def dictionary():
         message = "Word added to your lexicon."
     if request.args.get("deleted"):
         message = "Word removed from your lexicon."
+    if request.args.get("updated"):
+        message = "Dictionary entry updated."
     if request.args.get("import_error"):
         message = request.args.get("import_error", "CSV import failed.")[:200]
     if request.args.get("imported"):
@@ -895,6 +898,55 @@ def dictionary():
     return render_template(
         "dictionary.html", entries=entries, message=message, search=search,
         page=page, page_count=page_count, total_entries=total_entries, **page_data()
+    )
+
+
+@app.route("/dictionary/<int:entry_id>/edit", methods=["GET", "POST"])
+def edit_entry(entry_id):
+    db = get_db()
+    stored_entry = db.execute(
+        "SELECT * FROM lexicon_entries WHERE id = ?", (entry_id,)
+    ).fetchone()
+    if stored_entry is None:
+        abort(404)
+
+    entry = dict(stored_entry)
+    message = None
+    page = request.values.get("page", default=1, type=int) or 1
+    page = max(1, page)
+    search = request.values.get("q", "").strip()[:120]
+    if request.method == "POST":
+        for field in ("english", "faeric", "pronunciation", "part_of_speech", "notes"):
+            entry[field] = request.form.get(field, "").strip()
+        if not entry["english"] or not entry["faeric"]:
+            message = "Enter both the English and Faeric word."
+        elif max(len(entry[field]) for field in (
+            "english", "faeric", "pronunciation", "part_of_speech", "notes"
+        )) > 120:
+            message = "Keep each field to 120 characters or fewer."
+        else:
+            try:
+                db.execute(
+                    "UPDATE lexicon_entries SET english = ?, faeric = ?, english_norm = ?, "
+                    "faeric_norm = ?, part_of_speech = ?, notes = ?, pronunciation = ? "
+                    "WHERE id = ?",
+                    (
+                        entry["english"], entry["faeric"],
+                        normalize_english(entry["english"]), normalize_faeric(entry["faeric"]),
+                        entry["part_of_speech"], entry["notes"], entry["pronunciation"], entry_id,
+                    ),
+                )
+                db.commit()
+                return redirect(
+                    url_for("dictionary", updated="1", page=page, q=search)
+                )
+            except sqlite3.IntegrityError:
+                db.rollback()
+                message = "That exact English–Faeric pair is already in the lexicon."
+
+    return render_template(
+        "edit_entry.html", entry=entry, message=message, page=page, search=search,
+        **page_data(),
     )
 
 

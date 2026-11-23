@@ -27,7 +27,7 @@
     </form>
     {% if entries %}
       <div class="table-wrap"><table><thead><tr><th>English</th><th>Faeric</th><th>Pronunciation</th><th>Part of speech</th><th>Notes</th><th><span class="visually-hidden">Actions</span></th></tr></thead><tbody>
-        {% for entry in entries %}<tr><td>{{ entry.english }}</td><td class="faeric-text">{{ entry.faeric }}</td><td>{{ entry.pronunciation or "—" }}</td><td>{{ entry.part_of_speech or "—" }}</td><td>{{ entry.notes or "—" }}</td><td><form method="post" action="{{ url_for('delete_entry', entry_id=entry.id) }}"><input type="hidden" name="page" value="{{ page }}"><input type="hidden" name="q" value="{{ search }}"><button class="text-button" type="submit" aria-label="Delete {{ entry.english }} / {{ entry.faeric }}">Delete</button></form></td></tr>{% endfor %}
+        {% for entry in entries %}<tr><td>{{ entry.english }}</td><td class="faeric-text">{{ entry.faeric }}</td><td>{{ entry.pronunciation or "—" }}</td><td>{{ entry.part_of_speech or "—" }}</td><td>{{ entry.notes or "—" }}</td><td><div class="entry-actions"><a class="edit-link" href="{{ url_for('edit_entry', entry_id=entry.id, page=page, q=search) }}">Edit</a><form method="post" action="{{ url_for('delete_entry', entry_id=entry.id) }}"><input type="hidden" name="page" value="{{ page }}"><input type="hidden" name="q" value="{{ search }}"><button class="text-button" type="submit" aria-label="Delete {{ entry.english }} / {{ entry.faeric }}">Delete</button></form></div></td></tr>{% endfor %}
       </tbody></table></div>
       {% if page_count > 1 %}<nav class="pagination" aria-label="Dictionary pages">
         {% if page > 1 %}<a href="{{ url_for('dictionary', q=search, page=page - 1) }}">Previous</a>{% endif %}
