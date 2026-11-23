@@ -63,6 +63,7 @@ Multiple Faeric words mapping to one English word
 ## Online Deployment
 * only allow 5 unapproved suggestions to be sent by an individual user, the rest are saved on the account until the others are approved
 * throw unapproved suggestions on a queue or something similar for the admin (me) to access and approve
+    - asynchronous queue
 * approved suggestions should propogate to all users
 
 ## Local Use
