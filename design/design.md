@@ -64,6 +64,7 @@ Travel </br>
 * [x] Add edit button for dictionary entries
 * [x] Multiple English words mapping to one Faeric word
 * [x] Multiple Faeric words mapping to one English word
+* [ ] Dictionary search by Faeric pronunciation
 
 ### Artistic renders
 * Include options for rendering translations into cool pictures?
@@ -83,7 +84,7 @@ Travel </br>
 
 ## Local Use
 * spend time  adding to local dictionary in app to flesh out Faeric as much as possible
-    - Options to add to lexicon: ~~Nephi~~, having, been, born, ~~goodly~~, *parents*, ~~therefore~~, was, *taught*, ~~somewhat~~, **in**, **all**, *learning*, my, **father**, *seen*, many, afflictions, course, days, nevertheless, highly, favored, Lord, yea, had, a, great, knowledge, goodness, mysteries, God, make, record, proceedings
+    - Options to add to lexicon: ~~Nephi~~, *having*, *been*, *born*, *goodly*, *parents*, ~~therefore~~, *was*, *taught*, ~~somewhat~~, **in**, **all**, *learning*, **my**, **father**, *seen*, **many**, *afflictions*, **course**, *days*, ~~nevertheless~~, *highly*, *favored*, **Lord**, **yea**, *had*, **a**, **great**, *knowledge*, *goodness*, *mysteries*, **God**, **make**, *record*, ~~proceedings~~
 * include translation rules
     - Conjugation Rules: 
         - Add pronoun to the beginning of the verb. 

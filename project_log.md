@@ -18,4 +18,5 @@
 | 11/22/26 | Add edit button for dictionary entries, Multiple English words mapping to one Faeric word, Multiple Faeric words mapping to one English word | 0.75 |
 | 11/23/26 | Design discussion in class | 0.25 |
 | 11/23/26 | Design doc reorganization and filling out lexicon | 0.5 |
-| **Total** |   | **9.75**|
+| 11/24/26 | Add as much to lexicon as possible (using 1 Nephi 1:1) | 1.0 |
+| **Total** |   | **10.75**|
