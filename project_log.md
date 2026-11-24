@@ -19,4 +19,5 @@
 | 11/23/26 | Design discussion in class | 0.25 |
 | 11/23/26 | Design doc reorganization and filling out lexicon | 0.5 |
 | 11/24/26 | Add as much to lexicon as possible (using 1 Nephi 1:1) | 1.0 |
-| **Total** |   | **10.75**|
+| 11/24/26 | Add to lexicon using Spider-Man and Green Lantern's mottos | 0.5 |
+| **Total** |   | **11.25**|

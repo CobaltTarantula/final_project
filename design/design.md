@@ -40,18 +40,18 @@ Travel </br>
 ## ERD
 
 ### With grammar in database
-![img](/erd_with-grammar.png)
+![img](erd_with-grammar.png)
 
 ### Without grammar in database
-![img](/erd_without_grammar.png)
+![img](erd_without_grammar.png)
 
 ## System Design Diagrams
 
 ### With grammar in database
-![img](/diagram.png)
+![img](diagram.png)
 
 ### Without grammar in database
-![img](/diagram1.png)
+![img](diagram1.png)
 
 ## Daily Goals
 * 1-2 hours of work per day
@@ -84,8 +84,16 @@ Travel </br>
 
 ## Local Use
 * spend time  adding to local dictionary in app to flesh out Faeric as much as possible
-    - Options to add to lexicon: ~~Nephi~~, *having*, *been*, *born*, *goodly*, *parents*, ~~therefore~~, *was*, *taught*, ~~somewhat~~, **in**, **all**, *learning*, **my**, **father**, *seen*, **many**, *afflictions*, **course**, *days*, ~~nevertheless~~, *highly*, *favored*, **Lord**, **yea**, *had*, **a**, **great**, *knowledge*, *goodness*, *mysteries*, **God**, **make**, *record*, ~~proceedings~~
+    - Options to add to lexicon: 
+        - Key: ~~not included~~, *root word included*, **included**
+        - 1 Nephi 1: 
+            - ~~Nephi~~, *having*, *been*, *born*, *goodly*, *parents*, ~~therefore~~, *was*, *taught*, ~~somewhat~~, **in**, **all**, *learning*, **my**, **father**, *seen*, **many**, *afflictions*, **course**, *days*, ~~nevertheless~~, *highly*, *favored*, **Lord**, **yea**, *had*, **a**, **great**, *knowledge*, *goodness*, *mysteries*, **God**, **make**, *record*, ~~proceedings~~
+        - With great power, there must also come great responsibility:
+            - **power**, **there**, **must**, **also**, **come**, *responsibility*
+        - In brightest day, in darkest night, no evil shall escape my sight. Let those who worship evil's might, beware my power: Green Lantern's light!
+            - *brightest*, *darkest*, **evil**, shall, **escape**, *sight*, **Let**, *those*, worship, might, beware, Green, Lantern
 * include translation rules
+    - [ ] possessive? "steven's sandwich"
     - Conjugation Rules: 
         - Add pronoun to the beginning of the verb. 
         - Present = “u” + pronoun + verb 
