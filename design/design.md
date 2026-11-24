@@ -60,11 +60,43 @@ Travel </br>
 ## UX
 ![img](ux-translate.png)
 
-## Artistic renders
+### Ideas
+* [x] Add edit button for dictionary entries
+* [x] Multiple English words mapping to one Faeric word
+* [x] Multiple Faeric words mapping to one English word
+
+### Artistic renders
 * Include options for rendering translations into cool pictures?
 * CS355 graphics type stuff?
 * Example: rock image in source files
 
-## DND Player Page
+### DND Player Page
 * how proficient is your character?
 * use a metric to determine how much a person could use
+
+# Scaling and End Goal
+## Online Deployment
+* only allow 5 unapproved suggestions to be sent by an individual user, the rest are saved on the account until the others are approved
+* throw unapproved suggestions on a queue or something similar for the admin (me) to access and approve
+    - asynchronous queue
+* approved suggestions should propogate to all users
+
+## Local Use
+* spend time  adding to local dictionary in app to flesh out Faeric as much as possible
+    - Options to add to lexicon: ~~Nephi~~, having, been, born, ~~goodly~~, *parents*, ~~therefore~~, was, *taught*, ~~somewhat~~, **in**, **all**, *learning*, my, **father**, *seen*, many, afflictions, course, days, nevertheless, highly, favored, Lord, yea, had, a, great, knowledge, goodness, mysteries, God, make, record, proceedings
+* include translation rules
+    - Conjugation Rules: 
+        - Add pronoun to the beginning of the verb. 
+        - Present = “u” + pronoun + verb 
+        - Past = pronoun + word + “n” 
+        - Future = pronoun + word + “m” 
+        - end: -are, -ere, -ire, -ore, -ure
+    - only long vowels
+    - English short vowels -> eliminated or replaced with glottal stop marked by an apostraphe
+    - English to Latin/Spanish then apply rules. Then mangle
+* UI: Sun & Moon or White vs. Black Sun
+
+## End Goal
+Something *I* can pull up and use without needing to run it locally.
+* Doesn't need to be public
+* Doesn't need to be hosted online

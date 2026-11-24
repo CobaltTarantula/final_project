@@ -52,29 +52,4 @@ Travel </br>
 ## Diagram
 ![img](/diagram.png)
 
-## New Ideas
-Add edit button for dictionary entries
-Multiple English words mapping to one Faeric word
-Multiple Faeric words mapping to one English word
-
 # Future Codex Prompts
-
-# Scaling and End Goal
-## Online Deployment
-* only allow 5 unapproved suggestions to be sent by an individual user, the rest are saved on the account until the others are approved
-* throw unapproved suggestions on a queue or something similar for the admin (me) to access and approve
-    - asynchronous queue
-* approved suggestions should propogate to all users
-
-## Local Use
-* spend time  adding to local dictionary in app to flesh out Faeric as much as possible
-* include translation rules
-    - only long vowels
-    - English short vowels -> eliminated or replaced with glottal stop marked by an apostraphe
-    - English to Latin/Spanish then apply rules. Then mangle
-* UI: Sun & Moon or White vs. Black Sun
-
-## End Goal
-Something *I* can pull up and use without needing to run it locally.
-* Doesn't need to be public
-* Doesn't need to be hosted online
