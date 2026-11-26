@@ -91,9 +91,22 @@ Travel </br>
         - With great power, there must also come great responsibility:
             - **power**, **there**, **must**, **also**, **come**, *responsibility*
         - In brightest day, in darkest night, no evil shall escape my sight. Let those who worship evil's might, beware my power: Green Lantern's light!
-            - *brightest*, *darkest*, **evil**, shall, **escape**, *sight*, **Let**, *those*, worship, might, beware, Green, Lantern
+            - *brightest*, *darkest*, **evil**, ~~shall~~, **escape**, *sight*, **Let**, *those*, **worship**, *might*, **beware**, **Green**, **Lantern**
+        - colors:
+            - **red**, **orange**, **yellow**, **green**, **blue**, **purple**, **pink**, **white**, **grey**, **black**, **brown**
+        - According to all known laws of nature, there is no possible way that a bee can fly
+            - ~~According~~, *known*, *laws*, *nature*, *is*, **possible**, **way**, that, **bee**, **can**, **fly**
+        - **dictionary**
+        - There once was a man, a very rich man, he had a lot of sheep, he had a lot of ram
+            - once, *was*, *man*, +
+            **rich**, *had*, *lot*, **sheep**, **ram**
+
 * include translation rules
     - [ ] possessive? "steven's sandwich"
+    - [ ] modifiers: "-er", "-est"
+    - [ ] something to detect past/future tenses of words already in dictionary
+    - [ ] **me**/myself/I, **you**/yourself, **they**/themself/them, *he*/himself, she/herself
+    - [ ] suggested translations for words not in the dictionary
     - Conjugation Rules: 
         - Add pronoun to the beginning of the verb. 
         - Present = “u” + pronoun + verb 
