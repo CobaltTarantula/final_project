@@ -102,9 +102,9 @@ Travel </br>
             **rich**, *had*, *lot*, **sheep**, **ram**
 
 * include translation rules
-    - [ ] possessive? "steven's sandwich"
+    - [x] possessive s "steven's sandwich"
     - [ ] modifiers: "-er", "-est"
-    - [ ] something to detect past/future tenses of words already in dictionary
+    - [x] something to detect past/future tenses of words already in dictionary
     - [ ] **me**/myself/I, **you**/yourself, **they**/themself/them, *he*/himself, she/herself
     - [ ] suggested translations for words not in the dictionary
     - Conjugation Rules: 

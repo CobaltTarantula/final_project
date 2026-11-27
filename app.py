@@ -573,6 +573,83 @@ def pronunciation_for_component(entry):
     return entry["pronunciation"] or entry["faeric"]
 
 
+def cache_english_verb_forms(db, text, entries, conjugations):
+    """Create missing standalone past/future forms from dictionary verb lemmas."""
+    words = {}
+    for row in entries:
+        words.setdefault(row["english_norm"], []).append(row)
+    verb_entries = [row for row in entries if row["part_of_speech"] == "verb"]
+    if not verb_entries:
+        return entries
+
+    rules_by_tense = {rule["tense"]: rule for rule in conjugations}
+    raw_pieces = TOKEN_RE.findall(text)
+
+    def cache_form(english_form, verb, tense):
+        rule = rules_by_tense.get(tense)
+        if rule is None or not (rule["prefix"] or rule["suffix"]):
+            return
+        faeric_form = rule["prefix"] + verb["faeric"] + rule["suffix"]
+        english_norm = normalize_english(english_form)
+        faeric_norm = normalize_faeric(faeric_form)
+        if english_norm in words:
+            return
+
+        pronunciation = (
+            pronunciation_for_affix(rule["prefix"])
+            + pronunciation_for_component(verb)
+            + pronunciation_for_affix(rule["suffix"])
+        ).lower()
+        before = db.total_changes
+        db.execute(
+            """INSERT OR IGNORE INTO lexicon_entries
+               (english, faeric, english_norm, faeric_norm, part_of_speech, notes, pronunciation)
+               VALUES (?, ?, ?, ?, 'verb form', ?, ?)""",
+            (
+                english_form, faeric_form, english_norm, faeric_norm,
+                f"Generated {tense} form of {verb['english']}", pronunciation,
+            ),
+        )
+        if db.total_changes > before:
+            db.execute(
+                "UPDATE app_metadata SET value = "
+                "CAST(CAST(value AS INTEGER) + 1 AS TEXT) "
+                "WHERE key = 'lexicon_entry_count'"
+            )
+        generated = db.execute(
+            "SELECT * FROM lexicon_entries WHERE english_norm = ? AND faeric_norm = ?",
+            (english_norm, faeric_norm),
+        ).fetchone()
+        if generated is not None:
+            entries.append(generated)
+            words.setdefault(english_norm, []).append(generated)
+
+    for index, piece in enumerate(raw_pieces):
+        if not piece.isalnum():
+            continue
+        normalized = normalize_english(piece)
+        if normalized not in words:
+            verb, tense = find_english_verb(piece, verb_entries, allow_past=True)
+            if verb is not None and tense == "past":
+                cache_form(piece, verb, "past")
+
+        if normalized != "will":
+            continue
+        next_index = index + 1
+        while next_index < len(raw_pieces) and raw_pieces[next_index].isspace():
+            next_index += 1
+        if next_index >= len(raw_pieces) or not raw_pieces[next_index].isalnum():
+            continue
+        english_form = "".join(raw_pieces[index:next_index + 1])
+        if normalize_english(english_form) in words:
+            continue
+        verb, _ = find_english_verb(raw_pieces[next_index], verb_entries)
+        if verb is not None:
+            cache_form(english_form, verb, "future")
+
+    return entries
+
+
 def translate_text(text, direction, entries, rules, conjugations):
     """Translate vocabulary and apply configured affix and conjugation rules."""
     forward = direction == "en_to_fae"
@@ -817,6 +894,10 @@ def translate():
             entries = lookup_entries_for_translation(
                 db, translation_input, direction, rules, conjugations
             )
+            if direction == "en_to_fae":
+                entries = cache_english_verb_forms(
+                    db, translation_input, entries, conjugations
+                )
             result, unknown_words, pronunciation = translate_text(
                 translation_input, direction, entries, rules, conjugations
             )
