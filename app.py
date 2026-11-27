@@ -123,7 +123,36 @@ RUNE_PRONUNCIATIONS = {
     "j": "d͡ʒ", "J": "d͡ʒ", "n": "n", "m": "m", "u": "u",
     "O": "o͡ʊ", "y": "j",
 }
-IRREGULAR_PAST_FORMS = {"hold": "held"}
+RUNE_REFERENCE = [
+    {"rune": "t", "name": "Trye", "meaning": "Light, life, joy", "english": "t in top", "ipa": "/t/"},
+    {"rune": "d", "name": "Drye", "meaning": "Sun", "english": "d in dog", "ipa": "/d/"},
+    {"rune": "f", "name": "Frey", "meaning": "Heat", "english": "f in fish", "ipa": "/f/"},
+    {"rune": "v", "name": "Vey", "meaning": "Fire", "english": "v in van", "ipa": "/v/"},
+    {"rune": "i", "name": "Ave", "meaning": "Air", "english": "ay in day", "ipa": "/eɪ/"},
+    {"rune": "e", "name": "Eve", "meaning": "Cloud", "english": "ee in see", "ipa": "/iː/"},
+    {"rune": "w", "name": "Uan", "meaning": "Water", "english": "w in water", "ipa": "/w/"},
+    {"rune": "W", "name": "Uan", "meaning": "Rain", "english": "w in water", "ipa": "/w/"},
+    {"rune": "R", "name": "T'r", "meaning": "Earth", "english": "r in red", "ipa": "/ɹ/"},
+    {"rune": "R", "name": "T'r", "meaning": "Stone", "english": "r in red", "ipa": "/ɹ/"},
+    {"rune": "A", "name": "Aine", "meaning": "Lava", "english": "i in time", "ipa": "/aɪ/"},
+    {"rune": "L", "name": "L'v", "meaning": "Lightning", "english": "l in light", "ipa": "/l/"},
+    {"rune": "s", "name": "Syle", "meaning": "Cold", "english": "s in sun", "ipa": "/s/"},
+    {"rune": "Z", "name": "Zyle", "meaning": "Ice", "english": "z in zip", "ipa": "/z/"},
+    {"rune": "p", "name": "Pl'v", "meaning": "Plant", "english": "p in pen", "ipa": "/p/"},
+    {"rune": "B", "name": "Bl'v", "meaning": "Wood", "english": "b in book", "ipa": "/b/"},
+    {"rune": "k", "name": "Kor", "meaning": "Dark, death, misery", "english": "k in king", "ipa": "/k/"},
+    {"rune": "K", "name": "Kor", "meaning": "Moon", "english": "k in king", "ipa": "/k/"},
+    {"rune": "G", "name": "Gyur", "meaning": "Yet", "english": "g in go", "ipa": "/g/"},
+    {"rune": "H", "name": "Yhol", "meaning": "And", "english": "h in hat", "ipa": "/h/"},
+    {"rune": "j", "name": "Jhu", "meaning": "To", "english": "j in jam", "ipa": "/d͡ʒ/"},
+    {"rune": "J", "name": "Zhu", "meaning": "From, of", "english": "j in jam", "ipa": "/d͡ʒ/"},
+    {"rune": "n", "name": "Nur", "meaning": "Or", "english": "n in no", "ipa": "/n/"},
+    {"rune": "m", "name": "Mur", "meaning": "Nor", "english": "m in moon", "ipa": "/m/"},
+    {"rune": "u", "name": "Urd", "meaning": "So", "english": "oo in food", "ipa": "/u/"},
+    {"rune": "O", "name": "Ord", "meaning": "But", "english": "o in go", "ipa": "/o͡ʊ/"},
+    {"rune": "y", "name": "Yere", "meaning": "For", "english": "y in yes", "ipa": "/j/"},
+]
+IRREGULAR_PAST_FORMS = {"hold": "held", "have": "had"}
 
 app = Flask(__name__)
 IS_PRODUCTION = os.environ.get("APP_ENV", "development").casefold() == "production"
@@ -1214,6 +1243,11 @@ def history():
            ORDER BY h.id DESC LIMIT 100"""
     ).fetchall()
     return render_template("history.html", rows=rows, **page_data())
+
+
+@app.get("/runes")
+def runes():
+    return render_template("runes.html", runes=RUNE_REFERENCE, **page_data())
 
 
 initialize_db()

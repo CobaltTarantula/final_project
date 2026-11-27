@@ -84,6 +84,11 @@ td form { margin: 0; }
 .rule-explainer { margin-bottom: 16px; padding: 14px 15px; border-left: 3px solid var(--green); background: var(--green-soft); font-size: 13px; }
 .rule-explainer p { margin: 5px 0 0; }
 .rule-explainer code, td code { padding: 1px 4px; border-radius: 4px; background: var(--green-soft); }
+.main-content:has(.rune-reference) { max-width: 980px; }
+.rune-table { font-size: 13px; }
+.rune-table th, .rune-table td { padding: 9px 10px; }
+.rune-table .rune-glyph { width: 74px; color: var(--green); font-size: 30px; line-height: 1; text-align: center; }
+.rune-table .rune-ipa { white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .history-entry { padding: 14px 0; border-top: 1px solid var(--line); }
 .history-meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; }
 .history-pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 12px; }

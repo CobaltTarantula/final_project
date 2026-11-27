@@ -14,6 +14,7 @@
         <a class="{% if request.endpoint == 'translate' %}active{% endif %}" href="{{ url_for('translate') }}">Translate</a>
         <a class="{% if request.endpoint == 'dictionary' %}active{% endif %}" href="{{ url_for('dictionary') }}">Dictionary</a>
         <a class="{% if request.endpoint == 'rules' %}active{% endif %}" href="{{ url_for('rules') }}">Rules</a>
+        <a class="{% if request.endpoint == 'runes' %}active{% endif %}" href="{{ url_for('runes') }}">Runes</a>
         <a class="{% if request.endpoint == 'history' %}active{% endif %}" href="{{ url_for('history') }}">History</a>
       </nav>
     </header>

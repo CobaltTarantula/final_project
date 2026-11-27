@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Rune reference · Faeric{% endblock %}
+{% block content %}
+  <div class="rune-reference">
+  <h1>Faeric rune reference</h1>
+  <p class="subtitle">Rune names, meanings, familiar English sound comparisons, and IPA pronunciations from the rune guide.</p>
+  <p class="rule-explainer"><strong>Pronunciation key</strong><br>English comparisons are examples to help approximate each sound. Both lowercase j (“to”) and uppercase J (“from/of”) use /d͡ʒ/, like the “j” in <em>jam</em>.</p>
+  <div class="table-wrap rune-table-wrap">
+    <table class="rune-table">
+      <thead><tr><th>Rune</th><th>Letter key</th><th>Name</th><th>Meaning</th><th>English sound comparison</th><th>IPA</th></tr></thead>
+      <tbody>
+        {% for rune in runes %}
+          <tr>
+            <td class="rune-glyph faeric-text" aria-label="Rune {{ rune.rune }}">{{ rune.rune }}</td>
+            <td><code>{{ rune.rune }}</code></td>
+            <td>{{ rune.name }}</td>
+            <td>{{ rune.meaning }}</td>
+            <td>{{ rune.english }}</td>
+            <td class="rune-ipa">{{ rune.ipa }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  </div>
+{% endblock %}
