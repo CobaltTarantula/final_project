@@ -21,4 +21,5 @@
 | 11/24/26 | Add as much to lexicon as possible (using 1 Nephi 1:1) | 1.0 |
 | 11/24/26 | Add to lexicon using Spider-Man and Green Lantern's mottos | 0.5 |
 | 11/25/26 | Add to lexicon using Green Lantern's motto, colors, the Bee movie intro, and Veggie Tales. Also added tasks to accomplish to allow for automatic translation suggestion to design.md | 1.0 |
-| **Total** |   | **12.25**|
+| 11/27/26 | Possessive s configuration, and header renaming | 0.25 |
+| **Total** |   | **12.50**|

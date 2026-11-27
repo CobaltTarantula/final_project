@@ -16,6 +16,13 @@ DATABASE = Path(
     os.environ.get("FAERIC_DATABASE", ROOT / "instance" / "faeric.sqlite3")
 ).expanduser().resolve()
 TOKEN_RE = re.compile(r"\w+|[^\w\s]+|\s+", re.UNICODE)
+ENGLISH_POSSESSIVE_RE = re.compile(
+    r"(?P<owner>\b[\w-]+)(?:\x27|\u2019)s(?P<space>\s+)(?P<owned>[\w-]+)", re.UNICODE
+)
+NON_POSSESSIVE_CONTRACTION_OWNERS = {
+    "he", "how", "it", "let", "she", "that", "there", "they", "we", "what",
+    "when", "where", "which", "who", "why", "you",
+}
 MAX_TEXT_LENGTH = 500
 LEXICON_PAGE_SIZE = 50
 LEXICON_LOOKUP_BATCH_SIZE = 500
@@ -437,6 +444,17 @@ def english_verb_lookup_candidates(word):
     return candidates
 
 
+def rewrite_english_possessives(text):
+    """Turn simple English ``owner's noun`` forms into ``the noun of owner``."""
+    def reorder(match):
+        owner = match.group("owner")
+        if owner.casefold() in NON_POSSESSIVE_CONTRACTION_OWNERS:
+            return match.group(0)
+        return f"the {match.group('owned')} of {owner}"
+
+    return ENGLISH_POSSESSIVE_RE.sub(reorder, text)
+
+
 def candidate_lexicon_keys(text, direction, rules):
     """Build bounded lookup keys from the input, including possible phrases."""
     pieces = TOKEN_RE.findall(text)
@@ -784,6 +802,10 @@ def translate():
         elif len(original) > MAX_TEXT_LENGTH:
             message = f"Keep phrases to {MAX_TEXT_LENGTH} characters or fewer."
         else:
+            translation_input = (
+                rewrite_english_possessives(original)
+                if direction == "en_to_fae" else original
+            )
             rules = db.execute(
                 "SELECT * FROM language_rules WHERE enabled = 1 AND kind = 'suffix' ORDER BY id"
             ).fetchall()
@@ -793,10 +815,10 @@ def translate():
                 "SELECT * FROM language_rules WHERE enabled = 1 AND kind = 'conjugation'"
             ).fetchall()
             entries = lookup_entries_for_translation(
-                db, original, direction, rules, conjugations
+                db, translation_input, direction, rules, conjugations
             )
             result, unknown_words, pronunciation = translate_text(
-                original, direction, entries, rules, conjugations
+                translation_input, direction, entries, rules, conjugations
             )
             source, target = ("en", "fae") if direction == "en_to_fae" else ("fae", "en")
             db.execute(
