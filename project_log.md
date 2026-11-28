@@ -25,4 +25,4 @@
 | 11/25/26 | detect past/future tenses of words already in dictionary and generate conjugations | 0.25 |
 | 11/25/26 | rune page | 0.25 |
 | 11/25/26 | modifiers: "-er", "-est" | 0.5 |
-| **Total** |   | **13.5**|
+| **Total** |   | **13.5** |
