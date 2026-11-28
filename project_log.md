@@ -26,4 +26,4 @@
 | 11/27/26 | rune page | 0.25 |
 | 11/27/26 | modifiers: "-er", "-est" | 0.5 |
 | 11/27/26 | updated lexicon with possessive rules | 0.5 |
-| **Total** |   | **13.5** |
+| **Total** |   | **14.0** |
