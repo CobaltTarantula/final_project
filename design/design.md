@@ -105,7 +105,7 @@ Travel </br>
     - [x] possessive s "steven's sandwich"
     - [x] modifiers: "-er", "-est"
     - [x] something to detect past/future tenses of words already in dictionary
-    - [ ] **me**/myself/I, **you**/yourself, **they**/themself/them, *he*/himself, she/herself
+    - [x] **me**/myself/I, **you**/yourself, **they**/themself/them, *he*/himself, she/herself
     - [ ] ***suggested translations for words not in the dictionary***
     - Conjugation Rules: 
         - Add pronoun to the beginning of the verb. 

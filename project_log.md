@@ -22,7 +22,8 @@
 | 11/24/26 | Add to lexicon using Spider-Man and Green Lantern's mottos | 0.5 |
 | 11/25/26 | Add to lexicon using Green Lantern's motto, colors, the Bee movie intro, and Veggie Tales. Also added tasks to accomplish to allow for automatic translation suggestion to design.md | 1.0 |
 | 11/27/26 | Possessive s configuration, and header renaming | 0.25 |
-| 11/25/26 | detect past/future tenses of words already in dictionary and generate conjugations | 0.25 |
-| 11/25/26 | rune page | 0.25 |
-| 11/25/26 | modifiers: "-er", "-est" | 0.5 |
+| 11/27/26 | detect past/future tenses of words already in dictionary and generate conjugations | 0.25 |
+| 11/27/26 | rune page | 0.25 |
+| 11/27/26 | modifiers: "-er", "-est" | 0.5 |
+| 11/27/26 | updated lexicon with possessive rules | 0.5 |
 | **Total** |   | **13.5** |

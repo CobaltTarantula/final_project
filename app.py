@@ -77,7 +77,11 @@ SOURCE_LEXICON = [
     ("you", "ur", "pronoun", "Ur", "Plural, neutral"),
     ("you", "orn", "pronoun", "Orn", "Plural, formal"),
     ("you", "Orm", "pronoun", "Orm", "Plural, very formal"),
-    ("they", "kar", "pronoun", "Kayr", "Plural"),
+    ("they", "kir", "pronoun", "Kayr", "Plural"),
+    ("our", "namum", "possessive", "Naymum", "Possessive form of we"),
+    ("ours", "namum", "possessive", "Naymum", "Possessive form of we"),
+    ("her", "dkium", "possessive", "D’kaium", "Possessive form of she"),
+    ("hers", "dkium", "possessive", "D’kaium", "Possessive form of she"),
     ("happy", "fl", "adjective", "F’l", ""),
     ("sad", "tres", "adjective", "Trese", ""),
     ("angry", "fre", "adjective", "F’ree", ""),
@@ -172,6 +176,25 @@ IRREGULAR_ADJECTIVE_FORMS = {
     "most": (("much", "superlative"), ("many", "superlative")),
     "elder": (("old", "comparative"),),
     "eldest": (("old", "superlative"),),
+}
+PRONOUN_ALIASES = {
+    "me": ("i", ""),
+    "myself": ("i", ""),
+    "mine": ("my", ""),
+    "us": ("we", ""),
+    "ourselves": ("we", ""),
+    "yourself": ("you", "singular, neutral"),
+    "yourselves": ("you", "plural, neutral"),
+    "yours": ("your", ""),
+    "him": ("he", ""),
+    "himself": ("he", ""),
+    "her": ("she", ""),
+    "hers": ("her", ""),
+    "herself": ("she", ""),
+    "them": ("they", ""),
+    "themself": ("they (singular)", ""),
+    "themselves": ("they", ""),
+    "theirs": ("their", ""),
 }
 
 app = Flask(__name__)
@@ -399,6 +422,10 @@ def initialize_db():
         "INSERT OR IGNORE INTO languages (code, name) VALUES (?, ?)",
         [("en", "English"), ("fae", "Faeric")],
     )
+    lexicon_count_already_initialized = db.execute(
+        "SELECT 1 FROM app_metadata WHERE key = 'lexicon_entry_count'"
+    ).fetchone() is not None
+    source_lexicon_change_start = db.total_changes
     db.executemany(
         """INSERT OR IGNORE INTO lexicon_entries
            (english, faeric, english_norm, faeric_norm, part_of_speech, notes, pronunciation)
@@ -408,6 +435,7 @@ def initialize_db():
             for english, faeric, pos, pronunciation, notes in SOURCE_LEXICON
         ],
     )
+    new_source_entries = db.total_changes - source_lexicon_change_start
     for tense, prefix, suffix, description in SOURCE_CONJUGATIONS:
         db.execute(
             """INSERT INTO language_rules
@@ -422,6 +450,13 @@ def initialize_db():
         "INSERT OR IGNORE INTO app_metadata(key, value) "
         "SELECT 'lexicon_entry_count', CAST(COUNT(*) AS TEXT) FROM lexicon_entries"
     )
+    if lexicon_count_already_initialized and new_source_entries:
+        db.execute(
+            "UPDATE app_metadata SET value = "
+            "CAST(CAST(value AS INTEGER) + ? AS TEXT) "
+            "WHERE key = 'lexicon_entry_count'",
+            (new_source_entries,),
+        )
     db.commit()
     db.close()
 
@@ -517,6 +552,9 @@ def candidate_lexicon_keys(text, direction, rules):
         keys.add(normalized_word)
 
         if direction == "en_to_fae":
+            pronoun_alias = PRONOUN_ALIASES.get(normalized_word)
+            if pronoun_alias:
+                keys.add(normalize_english(pronoun_alias[0]))
             keys.update(english_verb_lookup_candidates(word))
             keys.update(
                 lemma for lemma, _degree in english_adjective_lemma_candidates(word)
@@ -748,6 +786,18 @@ def translate_text(text, direction, entries, rules, conjugations):
     words = {}
     for row in entries:
         words.setdefault(row[source_key], []).append(row)
+    if forward:
+        for alias, (canonical, note_match) in PRONOUN_ALIASES.items():
+            if alias in words:
+                continue
+            alias_rows = words.get(normalize_english(canonical), [])
+            if note_match:
+                alias_rows = [
+                    row for row in alias_rows
+                    if note_match in row["notes"].casefold()
+                ]
+            if alias_rows:
+                words[alias] = alias_rows
     verb_entries = [row for row in entries if row["part_of_speech"] == "verb"]
     pronoun_entries = [row for row in entries if row["part_of_speech"] == "pronoun"]
     translated = []
