@@ -153,6 +153,26 @@ RUNE_REFERENCE = [
     {"rune": "y", "name": "Yere", "meaning": "For", "english": "y in yes", "ipa": "/j/"},
 ]
 IRREGULAR_PAST_FORMS = {"hold": "held", "have": "had"}
+ADJECTIVE_DEGREE_SUFFIXES = (
+    ("superlative", "est", "ros"),
+    ("comparative", "er", "ro"),
+)
+IRREGULAR_ADJECTIVE_FORMS = {
+    "better": (("good", "comparative"), ("well", "comparative")),
+    "best": (("good", "superlative"), ("well", "superlative")),
+    "worse": (("bad", "comparative"), ("ill", "comparative")),
+    "worst": (("bad", "superlative"), ("ill", "superlative")),
+    "farther": (("far", "comparative"),),
+    "further": (("far", "comparative"),),
+    "farthest": (("far", "superlative"),),
+    "furthest": (("far", "superlative"),),
+    "less": (("little", "comparative"),),
+    "least": (("little", "superlative"),),
+    "more": (("much", "comparative"), ("many", "comparative")),
+    "most": (("much", "superlative"), ("many", "superlative")),
+    "elder": (("old", "comparative"),),
+    "eldest": (("old", "superlative"),),
+}
 
 app = Flask(__name__)
 IS_PRODUCTION = os.environ.get("APP_ENV", "development").casefold() == "production"
@@ -498,6 +518,13 @@ def candidate_lexicon_keys(text, direction, rules):
 
         if direction == "en_to_fae":
             keys.update(english_verb_lookup_candidates(word))
+            keys.update(
+                lemma for lemma, _degree in english_adjective_lemma_candidates(word)
+            )
+        else:
+            for _degree, _source_suffix, target_suffix in ADJECTIVE_DEGREE_SUFFIXES:
+                if normalized_word.endswith(target_suffix) and len(normalized_word) > len(target_suffix):
+                    keys.add(normalized_word[:-len(target_suffix)])
 
         for rule in rules:
             source_suffix = (
@@ -516,6 +543,40 @@ def candidate_lexicon_keys(text, direction, rules):
             keys.add(normalize(phrase))
 
     return keys
+
+
+def english_adjective_lemma_candidates(word):
+    """Return likely adjective lemmas for regular comparative/superlative forms."""
+    normalized = normalize_english(word)
+    irregular = IRREGULAR_ADJECTIVE_FORMS.get(normalized)
+    if irregular is not None:
+        return list(irregular)
+    candidates = []
+    for degree, suffix, _target_suffix in ADJECTIVE_DEGREE_SUFFIXES:
+        if not normalized.endswith(suffix) or len(normalized) <= len(suffix):
+            continue
+        stem = normalized[:-len(suffix)]
+        stems = [stem]
+        if len(stem) > 2 and stem[-1] == stem[-2]:
+            stems.append(stem[:-1])
+        if stem.endswith("i"):
+            stems.append(stem[:-1] + "y")
+        stems.append(stem + "e")
+        candidates.extend((candidate, degree) for candidate in dict.fromkeys(stems))
+    return candidates
+
+
+def english_adjective_form(lemma, degree):
+    """Build a regular English adjective degree form from its dictionary lemma."""
+    normalized = normalize_english(lemma)
+    ending = "er" if degree == "comparative" else "est"
+    if normalized.endswith("e"):
+        return normalized + ("r" if degree == "comparative" else "st")
+    if len(normalized) > 1 and normalized.endswith("y") and normalized[-2] not in "aeiou":
+        return normalized[:-1] + "i" + ending
+    if re.search(r"[a-z][aeiou][bcdfghjklmnpqrstvz]$", normalized):
+        return normalized + normalized[-1] + ending
+    return normalized + ending
 
 
 def fetch_lexicon_entries(db, field, keys):
@@ -830,6 +891,37 @@ def translate_text(text, direction, entries, rules, conjugations):
             else:
                 # Keep real homonyms visible instead of silently choosing one.
                 result = " / ".join(dict.fromkeys(row[target_key] for row in candidates))
+        if result is None and forward:
+            target_suffixes = {
+                degree: target_suffix
+                for degree, _source_suffix, target_suffix in ADJECTIVE_DEGREE_SUFFIXES
+            }
+            for lemma, degree in english_adjective_lemma_candidates(piece):
+                adjective_rows = [
+                    row for row in words.get(lemma, [])
+                    if row["part_of_speech"] == "adjective"
+                ]
+                if adjective_rows:
+                    chosen = preferred_entry(adjective_rows, direction)
+                    target_suffix = target_suffixes[degree]
+                    result = chosen[target_key] + target_suffix
+                    result_pronunciation = (
+                        pronunciation_for_component(chosen)
+                        + pronunciation_for_affix(target_suffix)
+                    ).lower()
+                    break
+        elif result is None:
+            for degree, _source_suffix, target_suffix in ADJECTIVE_DEGREE_SUFFIXES:
+                if normalized.endswith(target_suffix) and len(normalized) > len(target_suffix):
+                    stem = normalized[:-len(target_suffix)]
+                    adjective_rows = [
+                        row for row in words.get(stem, [])
+                        if row["part_of_speech"] == "adjective"
+                    ]
+                    if adjective_rows:
+                        chosen = preferred_entry(adjective_rows, direction)
+                        result = english_adjective_form(chosen["english"], degree)
+                        break
         if result is None:
             for rule in rules:
                 in_suffix = rule["source_suffix"] if forward else rule["target_suffix"]

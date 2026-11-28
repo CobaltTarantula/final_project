@@ -2,11 +2,16 @@
 {% block title %}Language rules · Faeric{% endblock %}
 {% block content %}
   <h1>Language rules</h1>
-  <p class="subtitle">The translator applies the conjugation patterns from your Faeric guide, then checks saved suffix mappings.</p>
+  <p class="subtitle">The translator applies built-in verb and adjective patterns, then checks saved suffix mappings.</p>
   {% if message %}<p class="notice" role="status">{{ message }}</p>{% endif %}
   <div class="rule-explainer"><strong>Verb conjugation from the source guide</strong><p>For a known subject pronoun followed by a known verb, the translator joins the rule, pronoun, and verb into one Faeric word with no spaces. Its pronunciation is joined into one string too. English simple past forms ending in “-ed” and future phrases using “will” select the past and future patterns; other recognized verbs use present.</p></div>
   <div class="table-wrap"><table><thead><tr><th>Tense</th><th>Faeric form</th><th>Source rule</th></tr></thead><tbody>
     {% for rule in conjugations %}<tr><td>{{ rule.name }}</td><td><code>{% if rule.tense == 'present' %}{{ rule.prefix }} + pronoun + verb{% else %}pronoun + verb + {{ rule.suffix }}{% endif %}</code></td><td>{{ rule.description }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  <div class="rule-explainer"><strong>Adjective degree patterns</strong><p>These patterns apply only when the English base word is a dictionary adjective. Existing exact dictionary forms take precedence. English spelling changes such as <em>bigger → big</em>, <em>nicer → nice</em>, and <em>happiest → happy</em> are recognized before adding the Faeric ending. Common irregular forms such as <em>better → good</em> and <em>best → good</em> use the same degree endings. Reverse translation returns regularized forms such as “gooder” and “goodest.”</p></div>
+  <div class="table-wrap"><table><thead><tr><th>Degree</th><th>English ending</th><th>Faeric ending</th><th>Example from <em>big</em></th></tr></thead><tbody>
+    <tr><td>Comparative</td><td><code>-er</code></td><td><code>-ro</code></td><td><code>bigro</code> (bigger)</td></tr>
+    <tr><td>Superlative</td><td><code>-est</code></td><td><code>-ros</code></td><td><code>bigros</code> (biggest)</td></tr>
   </tbody></table></div>
   <div class="rule-explainer"><strong>Optional suffix mappings</strong><p>These apply to a word after exact lexicon lookup. For an English → Faeric translation, the app removes the English suffix, looks up the stem, and adds the Faeric suffix. Reverse translation applies the inverse mapping.</p></div>
   <form method="post" class="entry-form">
